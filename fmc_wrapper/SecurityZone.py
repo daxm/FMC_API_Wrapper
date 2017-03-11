@@ -1,6 +1,7 @@
 import re
-import fmc_wrapper.API
+from .API import *
 
+__all__ = ['CreateSecurityZone']
 
 class _NameRequired(object):
     """
@@ -25,7 +26,7 @@ class _ModeValidate(object):
             raise Exception('User provided mode: "%s" is not a valid mode: "%s".' % (kwargs['mode'], ", ".join(self.MODE_CHOICES)))
 
 
-class Post(_NameRequired, _ModeValidate, object):
+class CreateSecurityZone(_NameRequired, _ModeValidate, object):
     """
     Creates a JSON formatted variable and POSTs it to the FMC.
 
@@ -58,7 +59,7 @@ class Post(_NameRequired, _ModeValidate, object):
 
         print("Creating Security Zones.")
         print(json_data)
-#        response = fmc_wrapper.API.PostData(self, self.url, json_data)
+#        response = API.PostData(self, self.usrl, json_data)
 #        if 'id' not in response:
 #            raise Exception("Creation of Security Zone failed.")
 #        self.id = response['id']

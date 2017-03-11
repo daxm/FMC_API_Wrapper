@@ -12,6 +12,7 @@ API_VERSION = '/api/fmc_platform/v1/'
 VERIFY_CERT = False
 TOKEN_LIFETIME = 60 * 30
 
+__all__=['PostData', 'PutData', 'GetData']
 
 def __init__(self, host, username='admin', password='Admin123', autodeploy=True):
     self.host = host
@@ -102,3 +103,50 @@ class PostData(object):
         if response:
             response.close()
         return json_response
+
+
+class PutData(object):
+    pass
+    """
+    Totally not working right now.
+    self.checktoken()
+    # PUT json_data with the REST CALL
+    try:
+        headers = {'Content-Type': 'application/json', 'X-auth-access-token': self.token}
+        url = self.base_url + url
+        response = requests.put(url, json=json_data, headers=headers, verify=self.VERIFY_CERT)
+        status_code = response.status_code
+        json_response = json.loads(response.text)
+        if status_code > 301 or 'error' in json_response:
+            response.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print("Error in PUT operation -->", str(err))
+        print("json_response -->\t", json_response)
+    if response:
+        response.close()
+    # return json_response
+    """
+
+
+class GetData(object):
+    pass
+    """
+    Totally not working now.
+    self.checktoken()
+    # GET requested data and return it.
+    try:
+        headers = {'Content-Type': 'application/json', 'X-auth-access-token': self.token}
+        url = self.base_url + url
+        response = requests.get(url, headers=headers, verify=self.VERIFY_CERT)
+        status_code = response.status_code
+        json_response = json.loads(response.text)
+        if status_code > 301 or 'error' in json_response:
+            response.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print("Error in GET operation -->", str(err))
+        print("json_response -->\t", json_response)
+    if response:
+        response.close()
+    # return json_response
+    """
+
