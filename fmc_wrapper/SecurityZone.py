@@ -47,7 +47,7 @@ class Post(_NameRequired, _ModeValidate, object):
         if 'desc' in kwargs:
             self.desc = kwargs['desc']
         else:
-            self.desc = "Security Zone created by API."
+            self.desc = 'Security Zone "' + self.name + '" created by API.'
 
         json_data = {
             "type": self.type,
@@ -58,7 +58,7 @@ class Post(_NameRequired, _ModeValidate, object):
 
         print("Creating Security Zones.")
         print(json_data)
-        response = fmc_wrapper.API.PostData(self, self.url, json_data)
+#        response = fmc_wrapper.API.PostData(self, self.url, json_data)
 #        if 'id' not in response:
 #            raise Exception("Creation of Security Zone failed.")
 #        self.id = response['id']

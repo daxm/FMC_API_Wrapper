@@ -10,9 +10,16 @@ password = 'C1sco12345'
 
 # What about the User/Pass/serverIP?  How to they get to the FMC methods?
 
-fmc_wrapper.SecurityZone.Post(name='IN', mode='ROUTED')
-fmc_wrapper.SecurityZone.Post(name='OUT', mode='ROUTED')
-fmc_wrapper.SecurityZone.Post(name='DMZ', mode='ROUTED', desc='DMZ Zone, but not used in the lab.')
+securityzones = [
+    {'name': 'IN', 'desc': 'Inside Security Zone created by API', 'mode': 'ROUTED'},
+    {'name': 'OUT', 'desc': 'Outside Security Zone created by API', 'mode': 'ROUTED'},
+    {'name': 'DMZ', 'desc': 'DMZ Security Zone created by API', 'mode': 'ROUTED'},
+    {'name': 'asdf', 'mode': 'TRANSPARENT'},
+]
+
+for zone in securityzones:
+    fmc_wrapper.SecurityZone.Post(name=zone['name'], mode=zone['mode'], desc=zone['desc'])
+# But what if I don't want to set a description on every one of them?  Hmmm.
 
 # What about deployment?  We don't want to deploy after each of the above statements
 #  but rather at the end of the script (assuming we don't disable autodeploy).
