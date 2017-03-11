@@ -5,4 +5,3 @@ http://www.cisco.com/c/en/us/td/docs/security/firepower/610/api/REST/Firepower_R
 
 Currently tested agains FMC v6.2.0
 """
-
