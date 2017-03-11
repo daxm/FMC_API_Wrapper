@@ -25,3 +25,4 @@ for zone in securityzones:
 # What about deployment?  We don't want to deploy after each of the above statements
 #  but rather at the end of the script (assuming we don't disable autodeploy).
 
+help(CreateSecurityZone)

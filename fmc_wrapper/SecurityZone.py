@@ -1,7 +1,7 @@
 import re
+from . import export
 from .API import *
 
-__all__ = ['CreateSecurityZone']
 
 class _NameRequired(object):
     """
@@ -26,6 +26,7 @@ class _ModeValidate(object):
             raise Exception('User provided mode: "%s" is not a valid mode: "%s".' % (kwargs['mode'], ", ".join(self.MODE_CHOICES)))
 
 
+@export
 class CreateSecurityZone(_NameRequired, _ModeValidate, object):
     """
     Creates a JSON formatted variable and POSTs it to the FMC.

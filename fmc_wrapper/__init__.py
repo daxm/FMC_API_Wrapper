@@ -6,8 +6,11 @@ http://www.cisco.com/c/en/us/td/docs/security/firepower/610/api/REST/Firepower_R
 Currently tested against FMC v6.2.0
 """
 
-from .SecurityZone import *
-from .NetworkObject import *
+__all__ = []
 
-
-__all__ = (SecurityZone.__all__ + NetworkObject.__all__)
+def export(defn):
+    globals()[defn.__name__] = defn
+    __all__.append(defn.__name__)
+    return defn
+from . import SecurityZone
+from . import NetworkObject
