@@ -1,9 +1,12 @@
 import re
-import fmc_wrapper.FMC
+import fmc_wrapper.API
 
 
 class _NameRequired(object):
-    # Alpha, numeric, underscore, and hyphen only.  (Starts with alpha or numeric too.)
+    """
+    Check to see wheather keyword 'name' contains only:
+    Alpha, numeric, underscore, and hyphen only.  (Starts with alpha or numeric too.)
+    """
     NAME_VALUES = "^[\w\d][\w\d_-]*$"
 
     def __init__(self, *args, **kwargs):
@@ -12,6 +15,9 @@ class _NameRequired(object):
 
 
 class _ModeValidate(object):
+    """
+    Ensure that keyword value 'mode' is a proper value.
+    """
     MODE_CHOICES = ['ROUTED', 'TRANSPARENT']
 
     def __init__(self, *args, **kwargs):
@@ -19,17 +25,19 @@ class _ModeValidate(object):
             raise Exception('User provided mode: "%s" is not a valid mode: "%s".' % (kwargs['mode'], ", ".join(self.MODE_CHOICES)))
 
 
-class SecurityZone(_NameRequired, _ModeValidate, object):
+class Post(_NameRequired, _ModeValidate, object):
     """
+    Creates a JSON formatted variable and POSTs it to the FMC.
+
     Currently only accepts name, mode, and desc variables.
     """
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
         self.REQUIRED_PARAMS = ['name', 'mode']
         for param in self.REQUIRED_PARAMS:
             if param not in kwargs.keys():
                 raise Exception("%s is required." % param)
+        super().__init__(*args, **kwargs)
         _NameRequired(**kwargs)
         _ModeValidate(**kwargs)
         self.name = kwargs['name']
@@ -49,12 +57,9 @@ class SecurityZone(_NameRequired, _ModeValidate, object):
         }
 
         print("Creating Security Zones.")
-        fmc1 = fmc_wrapper.FMC()
-#        response = fmc1.postdata(self.url, json_data)
+        print(json_data)
+        response = fmc_wrapper.API.PostData(self, self.url, json_data)
 #        if 'id' not in response:
 #            raise Exception("Creation of Security Zone failed.")
 #        self.id = response['id']
         print("\tSecurity Zone %s created." % self.name)
-
-SecurityZone(name='asdf', mode='ROUTED')
-

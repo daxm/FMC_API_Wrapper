@@ -8,7 +8,11 @@ serverIP = '172.16.100.100'
 username = 'apiadmin'
 password = 'C1sco12345'
 
-### What about the User/Pass/serverIP?  How to they get to the FMC methods?
-fmc_wrapper.SecurityZone.SecurityZone(name = 'IN', mode = 'ROUTED')
-fmc_wrapper.SecurityZone.SecurityZone(name = 'OUT', mode = 'ROUTED')
-fmc_wrapper.SecurityZone.SecurityZone(name = 'DMZ', mode = 'ROUTED', desc = 'DMZ Zone, but not used in the lab.')
+# What about the User/Pass/serverIP?  How to they get to the FMC methods?
+
+fmc_wrapper.SecurityZone.Post(name='IN', mode='ROUTED')
+fmc_wrapper.SecurityZone.Post(name='OUT', mode='ROUTED')
+fmc_wrapper.SecurityZone.Post(name='DMZ', mode='ROUTED', desc='DMZ Zone, but not used in the lab.')
+
+# What about deployment?  We don't want to deploy after each of the above statements
+#  but rather at the end of the script (assuming we don't disable autodeploy).
