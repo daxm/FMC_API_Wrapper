@@ -2,22 +2,15 @@
 FMC API Rest Objects
 
 """
-from .object_mixins import NameField, NameWithSpaceField, ModeField, DefaultAction, UuidField
+from .object_mixins import _AbstractField, NameField, NameWithSpaceField, ModeField, DefaultAction, UuidField
 
-class SecurityZone(ModeField, NameField, UuidField):
+class SecurityZone(ModeField, NameField, UuidField, _AbstractField):
     """
     Need: name, mode
     Optional: desc
     """
-    version = 1
-    url = '/object/securityzones'
-    type = 'SecurityZone'
-    name = kwargs['name']
-    mode = kwargs['mode']
-    if not kwargs['desc']:
-        description = 'Created by API'
-    else:
-        description = kwargs['desc']
+    _type = 'SecurityZone'
+    url = 'object/securityzones'
 
     """
         json_data = {
@@ -29,20 +22,14 @@ class SecurityZone(ModeField, NameField, UuidField):
     """
 
 
-class NetworkObject(ModeField, NameField, UuidField):
+class Network(ModeField, NameField, UuidField, _AbstractField):
     """
     Need: name, value
     Optional: desc
     """
-    version = 1
-    url = '/object/networks'
-    type = 'Network'
-    name = kwargs['name']
-    value = kwargs['value']
-    if not kwargs['desc']:
-        description = 'Created by API'
-    else:
-        description = kwargs['desc']
+    _type = 'Network'
+    url = 'object/networks'
+    
 
     """
         json_data = {
@@ -54,20 +41,14 @@ class NetworkObject(ModeField, NameField, UuidField):
     """
 
 
-class UrlObject(NameWithSpaceField, UuidField):
+class Url(NameWithSpaceField, UuidField, _AbstractField):
     """
     Need: name, value (AKA URL)
     Optional: desc
     """
-    version = 1
-    url = '/object/urls'
-    type = 'Url'
-    name = kwargs['name']
-    value = kwargs['value']
-    if not kwargs['desc']:
-        description = 'Created by API'
-    else:
-        description = kwargs['desc']
+    _type = 'Url'
+    url = 'object/urls'
+    
 
     """
             json_data = {
@@ -79,23 +60,13 @@ class UrlObject(NameWithSpaceField, UuidField):
     """
 
 
-class AccessControlPolicy(NameField, UuidField, DefaultAction):
+class AccessPolicy(NameField, UuidField, DefaultAction, _AbstractField):
     """
     Needs: name, defaultaction
     Optional: desc
     """
-    version = 1
-    url = '/policy/accesspolicies'
-    type = 'AccessPolicy'
-    name = kwargs['name']
-    if not kwargs['defaultaction']:
-        description = 'BLOCK'
-    else:
-        description = kwargs['defaultaction']
-    if not kwargs['desc']:
-        description = 'Created by API'
-    else:
-        description = kwargs['desc']
+    _type = 'AccessPolicy'
+    url = 'policy/accesspolicies'
 
     """
         json_data = {
@@ -107,27 +78,26 @@ class AccessControlPolicy(NameField, UuidField, DefaultAction):
     """
 
 
-class AcpRule(NameField, UuidField):
+class AccessRule(NameField, UuidField, _AbstractField):
     """
     Needs: name, action, acpname
     Optional: enabled, sendeventstofmc, logbegin, logend, ipspolicy, sourcezone, destzone, sourcenetwork, destnetwork, and many more!!!
     """
+# Create ActionField Mixin in objects for this
 # Available Actions: ['ALLOW', 'TRUST', 'BLOCK', 'MONITOR', 'BLOCK_RESET', 'BLOCK_INTERACTIVE', 'BLOCK_RESET_INTERACTIVE']
 
     type = 'AccessRule'
-    enabled = True
-    pass
 
 
-class Device(NameWithSpaceField, UuidField):
+class Device(NameWithSpaceField, UuidField, _AbstractField):
     """
     Needs: name, regkey, acpname
     Optional: license_caps, hostname
     """
+# Create LicenseCapsField Mixin in objects for this
 # LICENSE_CAPS = ['MALWARE', 'URLFilter', 'PROTECT', 'CONTROL', 'VPN']
     type = 'Device'
-    url = '/devices/devicerecords'
-    pass
+    url = 'devices/devicerecords'
 
 """
 -----------------------------------------
