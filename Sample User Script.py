@@ -1,7 +1,6 @@
 # This script takes a greenfield FMC and sets it up for the FTD v6.2.1 Lab.
 
-from fmc_wrapper import CreateSecurityZone
-
+from fmcapi import *
 
 # ############################# User Created Variables to be used below functions ############################
 # FMC Server Info.
@@ -9,20 +8,28 @@ serverIP = '172.16.100.100'
 username = 'apiadmin'
 password = 'C1sco12345'
 
-# What about the User/Pass/serverIP?  How to they get to the FMC methods?
-
-securityzones = [
-    {'name': 'IN', 'desc': 'Inside Security Zone created by API', 'mode': 'ROUTED'},
-    {'name': 'OUT', 'desc': 'Outside Security Zone created by API', 'mode': 'ROUTED'},
-    {'name': 'DMZ', 'desc': 'DMZ Security Zone created by API', 'mode': 'ROUTED'},
-    {'name': 'asdf', 'desc': 'asdf', 'mode': 'TRANSPARENT'},
+postdata = [
+    SecurityZone(name = 'IN', desc = 'Inside Security Zone created by API', mode = 'ROUTED'),
+#   example: SecurityZone() "returns": object({'objects/zones', {json_data})
+    SecurityZone(name = 'OUT', desc = 'Outside Security Zone created by API', mode = 'ROUTED'),
+    SecurityZone(name = 'DMZ', mode = 'ROUTED'),
+    NetworkObject()
+    AccessControlPolicy()
+    AcpRule()
 ]
 
-for zone in securityzones:
-    CreateSecurityZone(name=zone['name'], mode=zone['mode'], desc=zone['desc'])
-# But what if I don't want to set a description on every one of them?  Hmmm.
+getdata = []
+putdata = []
+deletedata = []
 
-# What about deployment?  We don't want to deploy after each of the above statements
-#  but rather at the end of the script (assuming we don't disable autodeploy).
+################################# Don't mess down here #####################
 
-help(CreateSecurityZone)
+with FMC(serverIP,username,password,autodeploy='False') as fmc1:
+    if postdata:
+        fmc1.post(postdata)
+    if putdata:
+        fmc1.put(putdata)
+    if getdata:
+        fmc1.get(getdata)
+    if deletedata:
+        fmc1.delete(deletedata)

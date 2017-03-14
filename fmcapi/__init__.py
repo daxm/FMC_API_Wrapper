@@ -4,6 +4,7 @@ import requests
 import sys
 import time
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
+from .objects import *
 
 # Disable annoying HTTP warnings
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -172,6 +173,7 @@ class FMC(object):
         response = self.postdata(url, json_data)
         return response['deviceList']
 
+"""
     def createsecurityzones(self, zones):
         print("Creating Security Zones.")
         url = "/object/securityzones"
@@ -244,6 +246,7 @@ class FMC(object):
             if response.get('id', '') is not '':
                 policy['id'] = response['id']
                 print("\tAccess Control Policy", policy['name'], "created.")
+"""
 
     def createacprules(self, rules):
         print("Creating ACP Rules.")
