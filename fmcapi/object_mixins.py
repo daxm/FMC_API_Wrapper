@@ -8,6 +8,9 @@ The point of a mixin is to create a type that can be "mixed in" to any other typ
 
 import re
 
+class _AbstractField(object):
+    pass
+
 class UuidField(object):
     UUIDs = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
 
