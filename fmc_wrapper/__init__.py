@@ -12,5 +12,7 @@ def export(defn):
     globals()[defn.__name__] = defn
     __all__.append(defn.__name__)
     return defn
+
+from . import API.FMC
 from . import SecurityZone
 from . import NetworkObject

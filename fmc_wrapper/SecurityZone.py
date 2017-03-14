@@ -1,49 +1,21 @@
-import re
+from . import _mixins
 from . import export
-from .API import *
-
-
-class _NameRequired(object):
-    """
-    Check to see wheather keyword 'name' contains only:
-    Alpha, numeric, underscore, and hyphen only.  (Starts with alpha or numeric too.)
-    """
-    NAME_VALUES = "^[\w\d][\w\d_-]*$"
-
-    def __init__(self, *args, **kwargs):
-        if not re.match(self.NAME_VALUES, kwargs['name']):
-            raise Exception("Only Alpha-numeric, Underscore, and Hyphen characters are permitted: %s" % kwargs['name'])
-
-
-class _ModeValidate(object):
-    """
-    Ensure that keyword value 'mode' is a proper value.
-    """
-    MODE_CHOICES = ['ROUTED', 'TRANSPARENT']
-
-    def __init__(self, *args, **kwargs):
-        if kwargs['mode'] not in self.MODE_CHOICES:
-            raise Exception('User provided mode: "%s" is not a valid mode: "%s".' % (kwargs['mode'], ", ".join(self.MODE_CHOICES)))
 
 
 @export
-class CreateSecurityZone(_NameRequired, _ModeValidate, object):
+class SecurityZone(_NameRequired, _ModeValidate, object):
     """
-    Creates a JSON formatted variable and POSTs it to the FMC.
-
+    Gathers and validates user submitted data in preparation for POST'ing to the FMC.
     Currently only accepts name, mode, and desc variables.
     """
 
     def __init__(self, *args, **kwargs):
         self.REQUIRED_PARAMS = ['name', 'mode']
-        for param in self.REQUIRED_PARAMS:
-            if param not in kwargs.keys():
-                raise Exception("%s is required." % param)
         super().__init__(*args, **kwargs)
-        _NameRequired(**kwargs)
-        _ModeValidate(**kwargs)
         self.name = kwargs['name']
         self.mode = kwargs['mode']
+        _mixins._ValueSyntax1({'name': kwargs['name']})
+        _mixins._SecurityZoneModeOptions(**kwargs)
         self.type = 'SecurityZone'
         self.url = '/object/securityzones'
         if 'desc' in kwargs:
@@ -57,11 +29,5 @@ class CreateSecurityZone(_NameRequired, _ModeValidate, object):
             "description": self.desc,
             "interfaceMode": self.mode,
         }
-
         print("Creating Security Zones.")
         print(json_data)
-#        response = API.PostData(self, self.usrl, json_data)
-#        if 'id' not in response:
-#            raise Exception("Creation of Security Zone failed.")
-#        self.id = response['id']
-        print("\tSecurity Zone %s created." % self.name)
