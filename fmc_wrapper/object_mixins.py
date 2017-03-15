@@ -10,18 +10,22 @@ import re
 
 
 class _FmcApiObject(object):
-
-    def __str__(self):
-        # Print/Output JSON String
-        pass
+    pass
 
 class UuidField(object):
+    """
+    """
+
     UUIDs = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
     _uuid = None
+    _field = 'uuid'
 
     def __init__(self, *args, **kwargs):
-        if 'uuid' in  kwargs:
-            self._uuid = kwargs['uuid']
+        if(self._field in self._fields):
+            raise Exception("%s field added more than once" % field)
+        _fields.append(self._field)
+        if _field in kwargs:
+            self._uuid = kwargs[self._field]
 
     @property
     def uuid(self):
@@ -35,11 +39,18 @@ class UuidField(object):
 
 
 class DescriptionField(object):
+    """
+    """
+
     _description = "Created by API."
+    _field = 'description'
 
     def __init__(self, *args, **kwargs):
-        if 'decription' in kwargs:
-            self.description = kwargs['description']
+        if(self._field in self._fields):
+            raise Exception("%s field added more than once" % field)
+        _fields.append(self._field)
+        if _field in kwargs:
+            self._description = kwargs[self._field]
 
     @property
     def description(self):
@@ -51,9 +62,22 @@ class DescriptionField(object):
 
 
 class NameField(object):
+    """
+    """
+
     NAME_VALUES = "^[\w\d][.\w\d_\-]*$"
+    ERROR_MESSAGE = "Only alpha-numeric, underscrore and hyphen characters are permitted: %s"
 
     _name = None
+    _field = 'name'
+
+    def __init__(self, *args, **kwargs):
+        if(self._field in self._fields):
+            raise Exception("%s field added more than once" % field)
+        _fields.append(self._field)
+        if _field in kwargs:
+            self._name = kwargs[self._field]
+
 
     def __init__(self, *args, **kwargs):
          if 'name' in kwargs:
@@ -66,10 +90,19 @@ class NameField(object):
     @name.setter
     def name(self, name):
         if not re.match(self.NAME_VALUES, name):
-            raise Exception("Only alpha-numeric, underscrore and hyphen characters are permitted: %s" % name)
+            raise Exception(self.ERROR_MESSAGE % name)
         self._name = name
 
+class NameWithSpaceField(NameField):
+    """
+    """ 
+
+    NAME_VALUES = "^[\w\d][.\w\d_\- ]*$"
+    ERROR_MSG = "Only alpha-numeric, underscrore, hyphen, and space characters are permitted"
+
 class ModeField(object):
+    """
+    """
 
     MODE_CHOICES = ['ROUTED', 'TRANSPARENT']
 
@@ -77,7 +110,7 @@ class ModeField(object):
 
     def __init__(self, *args, **kwargs):
          if 'mode' in kwargs:
-             self.name = kwargs['mode']
+             self._mode = kwargs['mode']
 
     @property
     def mode(self):
@@ -89,44 +122,50 @@ class ModeField(object):
             raise Exception('User provided mode: "%s" is not a valid mode: "%s".' % (self._mode, ", ".join(self.MODE_CHOICES)))
         self._mode = mode
 
-class DefaultAction(object):
+class DefaultActionField(object):
     """
     Needs work
     """
-    ACTION_CHOICES = ['BLOCK', 'PERMIT', 'TRUST', 'MONITOR', 'BLOCK_WITH_RESET', 'INTERACTIVE_BLOCK', 'INTERACTIVE_BLOCK_WITH_RESET', 'NETWORK_DISCOVERY', 'IPS_ACTION', 'FASTPATH']
+
+    DEFAULT_ACTION_CHOICES = ['BLOCK', 'PERMIT', 'TRUST', 'MONITOR', 'BLOCK_WITH_RESET', 'INTERACTIVE_BLOCK', 'INTERACTIVE_BLOCK_WITH_RESET', 'NETWORK_DISCOVERY', 'IPS_ACTION', 'FASTPATH']
 
     _defaultaction = None
 
     def __init__(self, *args, **kwargs):
          if 'defaultaction' in kwargs:
-             self.name = kwargs['defaultaction']
+             self._defaultaction = kwargs['defaultaction']
 
     @property
-    def mode(self):
+    def defaultaction(self):
         return self._defaultaction
 
-    @mode.setter
-    def mode(self, defaultaction):
-        if defaultaction not in self.ACTION_CHOICES:
-            raise Exception('User provided defaultaction: "%s" is valid: "%s".' % (self._defaultaction, ", ".join(self.ACTION_CHOICES)))
+    @defaultaction.setter
+    def defaultaction(self, defaultaction):
+        if defaultaction not in self.DEFAULT_ACTION_CHOICES:
+            raise Exception('User provided defaultaction: "%s" is valid: "%s".' % (self._defaultaction, ", ".join(self.DEFAULT_ACTION_CHOICES)))
         self._defaultaction = defaultaction
 
 
-class NameWithSpaceField(object):
-    NAME_VALUES = "^[\w\d][.\w\d_\- ]*$"
+class ActionField(object):
+    """
+    """
+    ACTION_CHOICES = ['ALLOW', 'TRUST', 'BLOCK', 'MONITOR', 'BLOCK_RESET', 'BLOCK_INTERACTIVE', 'BLOCK_RESET_INTERACTIVE']
 
-    _name = None
+    _action = None
 
     def __init__(self, *args, **kwargs):
-         if 'name' in kwargs:
-             self.name = kwargs['name']
+         if 'action' in kwargs:
+             self._action = kwargs['action']
 
     @property
-    def name(self):
-        return self._name
+    def action(self):
+        return self._action
 
-    @name.setter
-    def name(self, name):
-        if not re.match(self.NAME_VALUES, name):
-            raise Exception("Only alpha-numeric, underscrore, hyphen, and space characters are permitted: %s" % name)
-        self._name = name
+    @action.setter
+    def action(self, action):
+        if action not in self.ACTION_CHOICES:
+            raise Exception('Action: "%s" must be one of: "%s".' % (self._action, ", ".join(self.ACTION_CHOICES)))
+        self._action = action
+
+
+
