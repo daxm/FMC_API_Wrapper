@@ -10,7 +10,19 @@ import re
 
 
 class _FmcApiObject(object):
-    pass
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def __str__(self):
+        property_names = [
+            p for p in dir(self.__class__)
+                if isinstance(getattr(self.__class__, p), property)
+            ]
+        return_values = {}
+        for thing in property_names:
+            return_values.update({thing:getattr(self,thing)})
+        return "%s" % return_values
+
 
 class UuidField(object):
     """
@@ -18,14 +30,13 @@ class UuidField(object):
 
     UUIDs = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
     _uuid = None
-    _field = 'uuid'
+    _uuid_field = 'id'
 
     def __init__(self, *args, **kwargs):
-        if(self._field in self._fields):
-            raise Exception("%s field added more than once" % field)
-        _fields.append(self._field)
-        if _field in kwargs:
-            self._uuid = kwargs[self._field]
+        if self._uuid_field in kwargs:
+            self.name = kwargs[self._uuid_field]
+        super().__init__(self, *args, **kwargs)
+
 
     @property
     def uuid(self):
@@ -43,14 +54,13 @@ class DescriptionField(object):
     """
 
     _description = "Created by API."
-    _field = 'description'
+    _description_field = 'description'
 
     def __init__(self, *args, **kwargs):
-        if(self._field in self._fields):
-            raise Exception("%s field added more than once" % field)
-        _fields.append(self._field)
-        if _field in kwargs:
-            self._description = kwargs[self._field]
+        if self._description_field in kwargs:
+            self.description = kwargs[self._description_field]
+        super().__init__(self, *args, **kwargs)
+
 
     @property
     def description(self):
@@ -69,19 +79,12 @@ class NameField(object):
     ERROR_MESSAGE = "Only alpha-numeric, underscrore and hyphen characters are permitted: %s"
 
     _name = None
-    _field = 'name'
+    _name_field = 'name'
 
     def __init__(self, *args, **kwargs):
-        if(self._field in self._fields):
-            raise Exception("%s field added more than once" % field)
-        _fields.append(self._field)
-        if _field in kwargs:
-            self._name = kwargs[self._field]
-
-
-    def __init__(self, *args, **kwargs):
-         if 'name' in kwargs:
-             self.name = kwargs['name']
+        if self._name_field in kwargs:
+            self.name = kwargs[self._name_field]
+        super().__init__(self, *args, **kwargs)
 
     @property
     def name(self):
@@ -93,6 +96,7 @@ class NameField(object):
             raise Exception(self.ERROR_MESSAGE % name)
         self._name = name
 
+
 class NameWithSpaceField(NameField):
     """
     """ 
@@ -100,17 +104,19 @@ class NameWithSpaceField(NameField):
     NAME_VALUES = "^[\w\d][.\w\d_\- ]*$"
     ERROR_MSG = "Only alpha-numeric, underscrore, hyphen, and space characters are permitted"
 
+
 class ModeField(object):
     """
     """
 
-    MODE_CHOICES = ['ROUTED', 'TRANSPARENT']
-
+    _MODE_CHOICES = ['ROUTED', 'TRANSPARENT']
     _mode = None
+    _mode_field = 'mode'
 
     def __init__(self, *args, **kwargs):
-         if 'mode' in kwargs:
-             self._mode = kwargs['mode']
+        if self._mode_field in kwargs:
+            self.mode = kwargs[self._mode_field]
+        super().__init__(self, *args, **kwargs)
 
     @property
     def mode(self):
@@ -118,9 +124,10 @@ class ModeField(object):
 
     @mode.setter
     def mode(self, mode):
-        if mode not in self.MODE_CHOICES:
-            raise Exception('User provided mode: "%s" is not a valid mode: "%s".' % (self._mode, ", ".join(self.MODE_CHOICES)))
+        if mode not in self._MODE_CHOICES:
+            raise Exception('Mode must be one of the following: "%s".' % (", ".join(self._MODE_CHOICES)))
         self._mode = mode
+
 
 class DefaultActionField(object):
     """
@@ -130,10 +137,12 @@ class DefaultActionField(object):
     DEFAULT_ACTION_CHOICES = ['BLOCK', 'PERMIT', 'TRUST', 'MONITOR', 'BLOCK_WITH_RESET', 'INTERACTIVE_BLOCK', 'INTERACTIVE_BLOCK_WITH_RESET', 'NETWORK_DISCOVERY', 'IPS_ACTION', 'FASTPATH']
 
     _defaultaction = None
+    _defaultaction_field = 'defaultaction'
 
     def __init__(self, *args, **kwargs):
-         if 'defaultaction' in kwargs:
-             self._defaultaction = kwargs['defaultaction']
+        if self._defaultaction_field in kwargs:
+            self.name = kwargs[self._defaultaction_field]
+        super().__init__(self, *args, **kwargs)
 
     @property
     def defaultaction(self):
@@ -152,10 +161,12 @@ class ActionField(object):
     ACTION_CHOICES = ['ALLOW', 'TRUST', 'BLOCK', 'MONITOR', 'BLOCK_RESET', 'BLOCK_INTERACTIVE', 'BLOCK_RESET_INTERACTIVE']
 
     _action = None
+    _action_field = 'action'
 
     def __init__(self, *args, **kwargs):
-         if 'action' in kwargs:
-             self._action = kwargs['action']
+        if self._action_field in kwargs:
+            self.name = kwargs[self._action_field]
+        super().__init__(self, *args, **kwargs)
 
     @property
     def action(self):

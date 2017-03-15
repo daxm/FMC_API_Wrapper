@@ -2,6 +2,17 @@
 
 from fmc_wrapper import *
 
+#print(SecurityZone(name='IN', description='Inside Security Zone created by API', mode='ROUTED'))
+#print(SecurityZone(name='_IN', description='Inside Security Zone created by API', mode='ROUTED'))
+#print(SecurityZone(name='IN ', description='Inside Security Zone created by API', mode='ROUTED'))
+#print(SecurityZone(name='IN', mode='ROUTED'))
+#print(SecurityZone(name='IN', description='Inside Security Zone created by API', mode='RUTED'))
+#print(SecurityZone(name='IN', description='Inside Security Zone created by API', mode='TRANSPARENT'))
+#print(SecurityZone(name='OUT', description='Outside Security Zone created by API', mode='TRANSPARENT'))
+#print(dir(SecurityZone))
+#help(SecurityZone)
+exit()
+
 # ############################# User Created Variables to be used below functions ############################
 # FMC Server Info.
 serverIP = '172.16.100.100'

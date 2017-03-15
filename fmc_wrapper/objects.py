@@ -4,7 +4,8 @@ FMC API Rest Objects
 """
 from .object_mixins import _FmcApiObject, NameField, NameWithSpaceField, ModeField, DefaultActionField, ActionField, UuidField, DescriptionField
 
-class SecurityZone(ModeField, NameField, UuidField, DescriptionField, _FmcApiObject):
+
+class SecurityZone(ModeField, NameField, DescriptionField, _FmcApiObject):
     """
     Need: name, mode
     Optional: desc
@@ -24,15 +25,6 @@ class SecurityZone(ModeField, NameField, UuidField, DescriptionField, _FmcApiObj
             "interfaceMode": zone['mode'],
         }
     """
-    def __str__(self):
-        property_names = [
-            p for p in dir(__class__)
-                if isinstance(getattr(__class__, p), property)
-            ]
-        return_values = {}
-        for thing in property_names:
-            return_values.update({thing:getattr(self,thing)})
-        return "%s" % return_values
 
 class NetworkObject(ModeField, NameField, UuidField, _FmcApiObject):
     """
