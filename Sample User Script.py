@@ -2,7 +2,8 @@
 
 from fmc_wrapper import *
 
-#print(SecurityZone(name='IN', description='Inside Security Zone created by API', mode='ROUTED'))
+
+print(SecurityZone(name='IN', description='Inside Security Zone created by API', mode='ROUTED'))
 #print(SecurityZone(name='_IN', description='Inside Security Zone created by API', mode='ROUTED'))
 #print(SecurityZone(name='IN ', description='Inside Security Zone created by API', mode='ROUTED'))
 #print(SecurityZone(name='IN', mode='ROUTED'))
@@ -11,6 +12,16 @@ from fmc_wrapper import *
 #print(SecurityZone(name='OUT', description='Outside Security Zone created by API', mode='TRANSPARENT'))
 #print(dir(SecurityZone))
 #help(SecurityZone)
+json_data = """{
+  "name": "SecurityZoneObject5",
+  "description": "Sec-zone-UUID-1",
+  "type": "SecurityZone",
+  "mode": "ROUTED"
+}
+"""
+
+sz = SecurityZone.from_json(json_data)
+print(sz)
 exit()
 
 # ############################# User Created Variables to be used below functions ############################

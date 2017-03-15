@@ -7,6 +7,7 @@ The point of a mixin is to create a type that can be "mixed in" to any other typ
 """
 
 import re
+import json
 
 
 class _FmcApiObject(object):
@@ -21,7 +22,12 @@ class _FmcApiObject(object):
         return_values = {}
         for thing in property_names:
             return_values.update({thing:getattr(self,thing)})
-        return "%s" % return_values
+        return json.dumps(return_values)
+
+    @classmethod
+    def from_json(cls, json_str):
+        json_dict = json.loads(json_str)
+        return cls(**json_dict)
 
 
 class UuidField(object):
