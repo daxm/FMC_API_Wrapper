@@ -2,7 +2,7 @@
 FMC API Rest Objects
 
 """
-from .object_mixins import _FmcApiObject, NameField, NameWithSpaceField, ModeField, DefaultActionField, ActionField, UuidField, DescriptionField
+from .object_mixins import _FmcApiObject, AcpNameToUuid, NatIdField, RegkeyField, NameField, NameWithSpaceField, ModeField, DefaultActionField, ActionField, UuidField, ValueField, UrlField, DescriptionField
 
 
 class SecurityZone(ModeField, NameField, DescriptionField, _FmcApiObject):
@@ -11,7 +11,7 @@ class SecurityZone(ModeField, NameField, DescriptionField, _FmcApiObject):
     Optional: desc
     """
     _type = 'SecurityZone'
-    url = 'object/securityzones'
+    api_url = 'object/securityzones'
 
     def valid_for_post(self):
         if self.name and self.mode:
@@ -26,14 +26,18 @@ class SecurityZone(ModeField, NameField, DescriptionField, _FmcApiObject):
         }
     """
 
-class NetworkObject(ModeField, NameField, UuidField, _FmcApiObject):
+
+class NetworkObject(ModeField, NameField, UuidField, ValueField, _FmcApiObject):
     """
     Need: name, value
     Optional: desc
     """
     _type = 'Network'
-    url = 'object/networks'
+    api_url = 'object/networks'
     
+    def valid_for_post(self):
+        if self.name and self.value:
+            return True
 
     """
         json_data = {
@@ -45,14 +49,17 @@ class NetworkObject(ModeField, NameField, UuidField, _FmcApiObject):
     """
 
 
-class UrlObject(NameWithSpaceField, UuidField, _FmcApiObject):
+class UrlObject(NameWithSpaceField, UuidField, UrlField, _FmcApiObject):
     """
     Need: name, value (AKA URL)
     Optional: desc
     """
     _type = 'Url'
-    url = 'object/urls'
-    
+    api_url = 'object/urls'
+
+    def valid_for_post(self):
+        if self.name and self.api_url:
+            return True
 
     """
             json_data = {
@@ -70,7 +77,11 @@ class AccessControlPolicy(NameWithSpaceField, UuidField, DefaultActionField, _Fm
     Optional: desc
     """
     _type = 'AccessPolicy'
-    url = 'policy/accesspolicies'
+    api_url = 'policy/accesspolicies'
+
+    def valid_for_post(self):
+        if self.name and self.defaultaction:
+            return True
 
     """
         json_data = {
@@ -82,41 +93,40 @@ class AccessControlPolicy(NameWithSpaceField, UuidField, DefaultActionField, _Fm
     """
 
 
-class AccessControlPolicyRule(NameWithSpaceField, UuidField, _FmcApiObject):
+class AccessControlPolicyRule(NameWithSpaceField, UuidField, ActionField, AcpNameToUuid, _FmcApiObject):
     """
-    Needs: name, action, acpname
+    Needs: name, action, acpuuid
     Optional: enabled, sendeventstofmc, logbegin, logend, ipspolicy, sourcezone, destzone, sourcenetwork, destnetwork, and many more!!!
     """
-# Create ActionField Mixin in objects for this
-# Available Actions: ['ALLOW', 'TRUST', 'BLOCK', 'MONITOR', 'BLOCK_RESET', 'BLOCK_INTERACTIVE', 'BLOCK_RESET_INTERACTIVE']
 
     type = 'AccessRule'
+    acpuuid = ''
+    api_url = 'policy/accesspolicies/' + acpuuid + 'accessrules'
+
+    def valid_for_post(self):
+        if self.name and self.action and self.acpuuid:
+            return True
+
+    def valid_for_get(self):
+        if self.uuid and self.acpuuid:
+            return True
+
+    def valid_for_put(self):
+        self.valid_for_get()
+
+    def valid_for_delete(self):
+        if self.uuid:
+            return True
 
 
-class Device(NameWithSpaceField, UuidField, _FmcApiObject):
+class Device(NameWithSpaceField, UuidField, RegkeyField, AcpNameToUuid, NatIdField, _FmcApiObject):
     """
-    Needs: name, regkey, acpname
+    Needs: name, regkey, acpuuid
     Optional: license_caps, hostname
     """
-# Create LicenseCapsField Mixin in objects for this
-# LICENSE_CAPS = ['MALWARE', 'URLFilter', 'PROTECT', 'CONTROL', 'VPN']
     type = 'Device'
-    url = 'devices/devicerecords'
+    api_url = 'devices/devicerecords'
 
-"""
------------------------------------------
-
-from fmc_wrapper import FMC
-from fmc_wrapper.objects import SecurityZone
-
-stuff_to_post = [
-    SecurityZone(name="asdf", mode="ROUTED"),
-    NetworkObject(name=" asdf1", mode="ROUTED"),
-    UrlObject(name="Cisco", value='www.cisco.com')
-]
-
-with FMC(host='1.3.4.5',username='admin',password='pass') as fmc1:
-  fmc1.post(stuff_to_post)
-
------------------------------------------
-"""
+    def valid_for_post(self):
+        if self.name and self.regkey and self.acpuuid:
+            return True
