@@ -1,6 +1,6 @@
 # This script takes a greenfield FMC and sets it up for the FTD v6.2.1 Lab.
 
-import fmcapi
+import fmc_wrapper
 
 # ############################# User Created Variables to be used below functions ############################
 # FMC Server Info.
@@ -29,7 +29,7 @@ urlobjects = [
 ]
 
 # ########################################### Main Program ####################################################
-with fmcapi.FMC(serverIP, username, password) as fmc1:
+with fmc_wrapper.FMC(serverIP, username, password) as fmc1:
     # Add URL Objects to FMC
     fmc1.createurls(urlobjects)
 

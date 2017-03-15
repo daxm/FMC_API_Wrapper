@@ -2,15 +2,19 @@
 FMC API Rest Objects
 
 """
-from .object_mixins import _AbstractField, NameField, NameWithSpaceField, ModeField, DefaultAction, UuidField
+from .object_mixins import _FmcApiObject, NameField, NameWithSpaceField, ModeField, DefaultAction, UuidField, DescriptionField
 
-class SecurityZone(ModeField, NameField, UuidField, _AbstractField):
+class SecurityZone(ModeField, NameField, UuidField, DescriptionField, _FmcApiObject):
     """
     Need: name, mode
     Optional: desc
     """
     _type = 'SecurityZone'
     url = 'object/securityzones'
+
+    def valid_for_post(self):
+        requiredattributes = ['name', 'mode']
+        return True
 
     """
         json_data = {
@@ -20,9 +24,14 @@ class SecurityZone(ModeField, NameField, UuidField, _AbstractField):
             "interfaceMode": zone['mode'],
         }
     """
+    def __str__(self):
+        property_names = [
+            p for p in dir(SecurityZone)
+            if isinstance(getattr(SecurityZone, p), property)
+        ]
+        return "%s" % property_names
 
-
-class Network(ModeField, NameField, UuidField, _AbstractField):
+class NetworkObject(ModeField, NameField, UuidField, _FmcApiObject):
     """
     Need: name, value
     Optional: desc
@@ -41,7 +50,7 @@ class Network(ModeField, NameField, UuidField, _AbstractField):
     """
 
 
-class Url(NameWithSpaceField, UuidField, _AbstractField):
+class UrlObject(NameWithSpaceField, UuidField, _FmcApiObject):
     """
     Need: name, value (AKA URL)
     Optional: desc
@@ -60,7 +69,7 @@ class Url(NameWithSpaceField, UuidField, _AbstractField):
     """
 
 
-class AccessPolicy(NameField, UuidField, DefaultAction, _AbstractField):
+class AccessControlPolicy(NameWithSpaceField, UuidField, DefaultAction, _FmcApiObject):
     """
     Needs: name, defaultaction
     Optional: desc
@@ -78,7 +87,7 @@ class AccessPolicy(NameField, UuidField, DefaultAction, _AbstractField):
     """
 
 
-class AccessRule(NameField, UuidField, _AbstractField):
+class AccessControlPolicyRule(NameWithSpaceField, UuidField, _FmcApiObject):
     """
     Needs: name, action, acpname
     Optional: enabled, sendeventstofmc, logbegin, logend, ipspolicy, sourcezone, destzone, sourcenetwork, destnetwork, and many more!!!
@@ -89,7 +98,7 @@ class AccessRule(NameField, UuidField, _AbstractField):
     type = 'AccessRule'
 
 
-class Device(NameWithSpaceField, UuidField, _AbstractField):
+class Device(NameWithSpaceField, UuidField, _FmcApiObject):
     """
     Needs: name, regkey, acpname
     Optional: license_caps, hostname
@@ -102,8 +111,8 @@ class Device(NameWithSpaceField, UuidField, _AbstractField):
 """
 -----------------------------------------
 
-from fmcapi import FMC
-from fmcapi.objects import SecurityZone
+from fmc_wrapper import FMC
+from fmc_wrapper.objects import SecurityZone
 
 stuff_to_post = [
     SecurityZone(name="asdf", mode="ROUTED"),

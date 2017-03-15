@@ -1,6 +1,6 @@
 # This script takes a greenfield FMC and sets it up for the FTD v6.2.1 Lab.
 
-import fmcapi
+import fmc_wrapper
 
 # ############################# User Created Variables to be used below functions ############################
 # FMC Server Info.
@@ -89,7 +89,7 @@ acprules = [
 
 # ########################################### Main Program ####################################################
 
-with fmcapi.Cluster(serverIP, username=username, password=password) as fmc1:
+with fmc_wrapper.Cluster(serverIP, username=username, password=password) as fmc1:
     # Create Security Zones
     fmc1.createsecurityzones(securityzones)
     # Create Network Objects
