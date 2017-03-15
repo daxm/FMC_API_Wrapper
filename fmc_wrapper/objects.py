@@ -2,7 +2,7 @@
 FMC API Rest Objects
 
 """
-from .object_mixins import _FmcApiObject, NameField, NameWithSpaceField, ModeField, DefaultAction, UuidField, DescriptionField
+from .object_mixins import _FmcApiObject, NameField, NameWithSpaceField, ModeField, DefaultActionField, ActionField, UuidField, DescriptionField
 
 class SecurityZone(ModeField, NameField, UuidField, DescriptionField, _FmcApiObject):
     """
@@ -13,8 +13,8 @@ class SecurityZone(ModeField, NameField, UuidField, DescriptionField, _FmcApiObj
     url = 'object/securityzones'
 
     def valid_for_post(self):
-        requiredattributes = ['name', 'mode']
-        return True
+        if self.name and self.mode:
+            return True
 
     """
         json_data = {
@@ -26,8 +26,8 @@ class SecurityZone(ModeField, NameField, UuidField, DescriptionField, _FmcApiObj
     """
     def __str__(self):
         property_names = [
-            p for p in dir(SecurityZone)
-            if isinstance(getattr(SecurityZone, p), property)
+            p for p in dir(__class__)
+            if isinstance(getattr(__class__, p), property)
         ]
         return "%s" % property_names
 
@@ -69,7 +69,7 @@ class UrlObject(NameWithSpaceField, UuidField, _FmcApiObject):
     """
 
 
-class AccessControlPolicy(NameWithSpaceField, UuidField, DefaultAction, _FmcApiObject):
+class AccessControlPolicy(NameWithSpaceField, UuidField, DefaultActionField, _FmcApiObject):
     """
     Needs: name, defaultaction
     Optional: desc
