@@ -27,9 +27,12 @@ class SecurityZone(ModeField, NameField, UuidField, DescriptionField, _FmcApiObj
     def __str__(self):
         property_names = [
             p for p in dir(__class__)
-            if isinstance(getattr(__class__, p), property)
-        ]
-        return "%s" % property_names
+                if isinstance(getattr(__class__, p), property)
+            ]
+        return_values = {}
+        for thing in property_names:
+            return_values.update({thing:getattr(self,thing)})
+        return "%s" % return_values
 
 class NetworkObject(ModeField, NameField, UuidField, _FmcApiObject):
     """
