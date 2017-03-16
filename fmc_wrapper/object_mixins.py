@@ -332,6 +332,15 @@ class AcpNameToUuid(object):
         self._acpuuid = acpuuid
 
 
+class NetworkObjectNameToUuid(object):
+    """
+    Take an Network Object 'name' and return its UUID.
+    This would be used in the sourceNetwork, destNetworks in ACPRule.
+    We will need something like this too for the UrlName.
+    """
+    pass
+
+
 class RegkeyField(object):
     """
     "regkey" used as keyword for the Registration Key when POSTing Devices.
