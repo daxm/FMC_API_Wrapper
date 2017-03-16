@@ -15,18 +15,32 @@ class _FmcApiObject(object):
     Methods for dealing with misc items used by other object_mixins and/or objects.
     """
 
+    _type = None
+    _type_field = 'type'
+
+    @property
+    def type(self):
+        return self._type
+
+    @type.setter
+    def type(self, type):
+        self._type = type
+ 
     def __init__(self, *args, **kwargs):
-        pass
+        if self._type_field in kwargs:
+            self.type = kwargs[self._type_field]
 
     def __str__(self):
         property_names = [
             p for p in dir(self.__class__)
                 if isinstance(getattr(self.__class__, p), property)
             ]
-        return_values = {}
-        for thing in property_names:
-            return_values.update({thing:getattr(self,thing)})
-        return json.dumps(return_values)
+        prop_dict = {}
+        for prop in property_names:
+            val = getattr(self, prop)
+            if val:
+                prop_dict[prop] = val
+        return json.dumps(prop_dict)
 
     @classmethod
     def from_json(cls, json_str):
@@ -45,9 +59,8 @@ class UuidField(object):
 
     def __init__(self, *args, **kwargs):
         if self._uuid_field in kwargs:
-            self.name = kwargs[self._uuid_field]
+            self.uuid = kwargs[self._uuid_field]
         super().__init__(self, *args, **kwargs)
-
 
     @property
     def uuid(self):
@@ -65,7 +78,7 @@ class DescriptionField(object):
     Used in many of the Objects and Policies.  References the keyword "description".
     """
 
-    _description = "Created by API."
+    _description = None
     _description_field = 'description'
 
     def __init__(self, *args, **kwargs):
@@ -136,7 +149,7 @@ class NameField(object):
     """
 
     NAME_VALUES = "^[\w\d][.\w\d_\-]*$"
-    ERROR_MESSAGE = "Only alpha-numeric, underscrore and hyphen characters are permitted: %s"
+    ERROR_MESSAGE = "Only alpha-numeric, underscore and hyphen characters are permitted: %s"
 
     _name = None
     _name_field = 'name'
@@ -163,7 +176,34 @@ class NameWithSpaceField(NameField):
     """ 
 
     NAME_VALUES = "^[\w\d][.\w\d_\- ]*$"
-    ERROR_MSG = "Only alpha-numeric, underscrore, hyphen, and space characters are permitted"
+    ERROR_MSG = "Only alpha-numeric, underscore, hyphen, and space characters are permitted"
+
+
+class HostnameField(object):
+    """
+    "hostName" is used throughout many Objects and Policies.
+    """
+
+    HOSTNAME_VALUES = "^[\w\d][.\w\d_\- ]*$"
+    ERROR_MESSAGE = "Only alpha-numeric, underscore, hyphen and space characters are permitted: %s"
+
+    _hostname = None
+    _hostname_field = 'hostname'
+
+    def __init__(self, *args, **kwargs):
+        if self._hostname_field in kwargs:
+            self.hostname = kwargs[self._hostname_field]
+        super().__init__(self, *args, **kwargs)
+
+    @property
+    def hostname(self):
+        return self._hostname
+
+    @hostname.setter
+    def hostname(self, hostname):
+        if not re.match(self.HOSTNAME_VALUES, hostname):
+            raise Exception(self.ERROR_MESSAGE % hostname)
+        self._hostname = hostname
 
 
 class ModeField(object):
@@ -191,6 +231,32 @@ class ModeField(object):
         self._mode = mode
 
 
+class InterfaceModeField(object):
+    """
+    "interfaceMode"
+    """
+
+    _INTERFACE_MODE_CHOICES = ['PASSIVE', 'INLINE', 'SWITCHED', 'ROUTED', 'ASA']
+    _interfaceMode = None
+    _interfaceMode_field = 'interfaceMode'
+
+    def __init__(self, *args, **kwargs):
+        if self._interfaceMode_field in kwargs:
+            self.interfaceMode = kwargs[self._interfaceMode_field]
+        super().__init__(self, *args, **kwargs)
+
+    @property
+    def interfaceMode(self):
+        return self._mode
+
+    @interfaceMode.setter
+    def interfaceMode(self, interfaceMode):
+        if interfaceMode not in self._INTERFACE_MODE_CHOICES:
+            raise Exception('interfaceMode must be one of the following: "%s".' % (", ".join(self._INTERFACE_MODE_CHOICES)))
+        self._interfaceMode = interfaceMode
+
+
+
 class DefaultActionField(object):
     """
     "defaultaction" is used as the keyword in specifying the Default Action of an Access Control Policy.
@@ -199,11 +265,11 @@ class DefaultActionField(object):
     DEFAULT_ACTION_CHOICES = ['BLOCK', 'PERMIT', 'TRUST', 'MONITOR', 'BLOCK_WITH_RESET', 'INTERACTIVE_BLOCK', 'INTERACTIVE_BLOCK_WITH_RESET', 'NETWORK_DISCOVERY', 'IPS_ACTION', 'FASTPATH']
 
     _defaultaction = None
-    _defaultaction_field = 'defaultaction'
+    _defaultaction_field = 'defaultAction'
 
     def __init__(self, *args, **kwargs):
         if self._defaultaction_field in kwargs:
-            self.name = kwargs[self._defaultaction_field]
+            self.defaultaction = kwargs[self._defaultaction_field]
         super().__init__(self, *args, **kwargs)
 
     @property
@@ -228,7 +294,7 @@ class ActionField(object):
 
     def __init__(self, *args, **kwargs):
         if self._action_field in kwargs:
-            self.name = kwargs[self._action_field]
+            self.action = kwargs[self._action_field]
         super().__init__(self, *args, **kwargs)
 
     @property
@@ -247,11 +313,11 @@ class AcpNameToUuid(object):
     Take an ACP name and return its UUID.
     """
     _acpuuid = None
-    _acpuuid_field = 'acpname'
+    _acpuuid_field = 'acpName'
 
     def __init__(self, *args, **kwargs):
         if self._acpuuid_field in kwargs:
-            self.name = kwargs[self._acpuuid_field]
+            self.acpuuid = kwargs[self._acpuuid_field]
         super().__init__(self, *args, **kwargs)
 
     @property
@@ -275,7 +341,7 @@ class RegkeyField(object):
 
     def __init__(self, *args, **kwargs):
         if self._regkey_field in kwargs:
-            self.url = kwargs[self._regkey_field]
+            self.regkey = kwargs[self._regkey_field]
         super().__init__(self, *args, **kwargs)
 
     @property
@@ -289,20 +355,59 @@ class RegkeyField(object):
 
 class NatIdField(object):
     """
-    "natid" used as keyword for the NAT ID when POSTing Devices.
+    "natId" used as keyword for the NAT ID when POSTing Devices.
     """
-    _natid = None
-    _natid_field = 'url'
+    _natId = None
+    _natId_field = 'natId'
 
     def __init__(self, *args, **kwargs):
-        if self._natid_field in kwargs:
-            self.url = kwargs[self._natid_field]
+        if self._natId_field in kwargs:
+            self.natId = kwargs[self._natId_field]
         super().__init__(self, *args, **kwargs)
 
     @property
-    def natid(self):
-        return self._natid
+    def natId(self):
+        return self._natId
 
-    @natid.setter
-    def natid(self, natid):
-        self._natid = natid
+    @natId.setter
+    def natId(self, natId):
+        self._natId = natId
+
+class SourceNetworkField(object):
+    """
+    """
+    _sourceNetwork = None
+    _sourceNetwork_field = 'sourceNetwork'
+
+    def __init__(self, *args, **kwargs):
+        if self._sourceNetwork_field in kwargs:
+            self.sourceNetwork = kwargs[self._sourceNetwork_field]
+        super().__init__(self, *args, **kwargs)
+
+    @property
+    def sourceNetwork(self):
+        return self._sourceNetwork
+
+    @sourceNetwork.setter
+    def sourceNetwork(self, sourceNetwork):
+        self._sourceNetwork = sourceNetwork
+
+class DestNetworkField(object):
+    """
+    """
+    _destNetwork = None
+    _destNetwork_field = 'destNetwork'
+
+    def __init__(self, *args, **kwargs):
+        if self._destNetwork_field in kwargs:
+            self.destNetwork = kwargs[self._destNetwork_field]
+        super().__init__(self, *args, **kwargs)
+
+    @property
+    def destNetwork(self):
+        return self._destNetwork
+
+    @destNetwork.setter
+    def destNetwork(self, destNetwork):
+        self._destNetwork = destNetwork
+
