@@ -10,7 +10,7 @@ class SecurityZone(ModeField, NameField, DescriptionField, _FmcApiObject):
     Need: name, mode
     Optional: desc
     """
-    _type = 'SecurityZone'
+    type_ = 'SecurityZone'
     api_url = 'object/securityzones'
 
     def valid_for_post(self):
@@ -32,7 +32,7 @@ class NetworkObject(ModeField, NameField, UuidField, ValueField, _FmcApiObject):
     Need: name, value
     Optional: desc
     """
-    _type = 'Network'
+    type_ = 'Network'
     api_url = 'object/networks'
     
     def valid_for_post(self):
@@ -54,7 +54,7 @@ class UrlObject(NameWithSpaceField, UuidField, UrlField, _FmcApiObject):
     Need: name, value (AKA URL)
     Optional: desc
     """
-    _type = 'Url'
+    type_ = 'Url'
     api_url = 'object/urls'
 
     def valid_for_post(self):
@@ -76,7 +76,7 @@ class AccessControlPolicy(NameWithSpaceField, UuidField, DefaultActionField, _Fm
     Needs: name, defaultaction
     Optional: desc
     """
-    _type = 'AccessPolicy'
+    type_ = 'AccessPolicy'
     api_url = 'policy/accesspolicies'
 
     def valid_for_post(self):
@@ -99,7 +99,7 @@ class AccessControlPolicyRule(NameWithSpaceField, UuidField, ActionField, AcpNam
     Optional: enabled, sendeventstofmc, logbegin, logend, ipspolicy, sourcezone, destzone, sourcenetwork, destnetwork, and many more!!!
     """
 
-    _type = 'AccessRule'
+    type_ = 'AccessRule'
     acpuuid = ''
     api_url = 'policy/accesspolicies/' + acpuuid + 'accessrules'
 
@@ -124,7 +124,7 @@ class Device(NameWithSpaceField, UuidField, RegkeyField, AcpNameToUuid, NatIdFie
     Needs: name, regkey, acpuuid
     Optional: license_caps, hostname
     """
-    _type = 'Device'
+    type_ = 'Device'
     api_url = 'devices/devicerecords'
 
     def valid_for_post(self):
