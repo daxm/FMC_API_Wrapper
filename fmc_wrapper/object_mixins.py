@@ -15,8 +15,20 @@ class _FmcApiObject(object):
     Methods for dealing with misc items used by other object_mixins and/or objects.
     """
 
+    _type = None
+    _type_field = 'type'
+
+    @property
+    def type(self):
+        return self._type
+
+    @type.setter
+    def type(self, type):
+        self._type = type
+ 
     def __init__(self, *args, **kwargs):
-        pass
+        if self._type_field in kwargs:
+            self.type = kwargs[self._type_field]
 
     def __str__(self):
         property_names = [
@@ -45,9 +57,8 @@ class UuidField(object):
 
     def __init__(self, *args, **kwargs):
         if self._uuid_field in kwargs:
-            self.name = kwargs[self._uuid_field]
+            self.uuid = kwargs[self._uuid_field]
         super().__init__(self, *args, **kwargs)
-
 
     @property
     def uuid(self):
@@ -203,7 +214,7 @@ class DefaultActionField(object):
 
     def __init__(self, *args, **kwargs):
         if self._defaultaction_field in kwargs:
-            self.name = kwargs[self._defaultaction_field]
+            self.defaultaction = kwargs[self._defaultaction_field]
         super().__init__(self, *args, **kwargs)
 
     @property
@@ -228,7 +239,7 @@ class ActionField(object):
 
     def __init__(self, *args, **kwargs):
         if self._action_field in kwargs:
-            self.name = kwargs[self._action_field]
+            self.action = kwargs[self._action_field]
         super().__init__(self, *args, **kwargs)
 
     @property
@@ -251,7 +262,7 @@ class AcpNameToUuid(object):
 
     def __init__(self, *args, **kwargs):
         if self._acpuuid_field in kwargs:
-            self.name = kwargs[self._acpuuid_field]
+            self.acpuuid = kwargs[self._acpuuid_field]
         super().__init__(self, *args, **kwargs)
 
     @property
