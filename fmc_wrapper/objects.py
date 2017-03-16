@@ -2,7 +2,7 @@
 FMC API Rest Objects
 
 """
-from .object_mixins import _FmcApiObject, AcpNameToUuid, NatIdField, RegkeyField, NameField, NameWithSpaceField, ModeField, DefaultActionField, ActionField, UuidField, ValueField, UrlField, DescriptionField
+from .object_mixins import _FmcApiObject, AcpNameToUuid, NatIdField, RegkeyField, NameField, NameWithSpaceField, ModeField, DefaultActionField, ActionField, UuidField, ValueField, UrlField, DescriptionField, SourceNetworkField
 
 
 class SecurityZone(ModeField, NameField, DescriptionField, _FmcApiObject):
@@ -93,7 +93,7 @@ class AccessControlPolicy(NameWithSpaceField, UuidField, DefaultActionField, _Fm
     """
 
 
-class AccessControlPolicyRule(NameWithSpaceField, UuidField, ActionField, AcpNameToUuid, _FmcApiObject):
+class AccessControlPolicyRule(NameWithSpaceField, UuidField, SourceNetworkField, ActionField, AcpNameToUuid, _FmcApiObject):
     """
     Needs: name, action, acpuuid
     Optional: enabled, sendeventstofmc, logbegin, logend, ipspolicy, sourcezone, destzone, sourcenetwork, destnetwork, and many more!!!

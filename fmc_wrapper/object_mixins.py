@@ -288,7 +288,7 @@ class RegkeyField(object):
 
     def __init__(self, *args, **kwargs):
         if self._regkey_field in kwargs:
-            self.url = kwargs[self._regkey_field]
+            self.regkey = kwargs[self._regkey_field]
         super().__init__(self, *args, **kwargs)
 
     @property
@@ -302,20 +302,39 @@ class RegkeyField(object):
 
 class NatIdField(object):
     """
-    "natid" used as keyword for the NAT ID when POSTing Devices.
+    "natId" used as keyword for the NAT ID when POSTing Devices.
     """
-    _natid = None
-    _natid_field = 'url'
+    _natId = None
+    _natId_field = 'natId'
 
     def __init__(self, *args, **kwargs):
-        if self._natid_field in kwargs:
-            self.url = kwargs[self._natid_field]
+        if self._natId_field in kwargs:
+            self.natId = kwargs[self._natId_field]
         super().__init__(self, *args, **kwargs)
 
     @property
-    def natid(self):
-        return self._natid
+    def natId(self):
+        return self._natId
 
     @natid.setter
-    def natid(self, natid):
-        self._natid = natid
+    def natId(self, natId):
+        self._natId = natId
+
+class SourceNetworkField(object):
+    """
+    """
+    _sourceNetwork = None
+    _sourceNetwork_field = 'sourceNetwork'
+
+    def __init__(self, *args, **kwargs):
+        if self._sourceNetwork_field in kwargs:
+            self.sourceNetwork = kwargs[self._sourceNetwork_field]
+        super().__init__(self, *args, **kwargs)
+
+    @property
+    def sourceNetwork(self):
+        return self._sourceNetwork
+
+    @sourceNetwork.setter
+    def sourceNetwork(self, sourceNetwork):
+        self._sourceNetwork = sourceNetwork
