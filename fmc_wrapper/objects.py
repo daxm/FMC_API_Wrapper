@@ -2,10 +2,10 @@
 FMC API Rest Objects
 
 """
-from .object_mixins import _FmcApiObject, AcpNameToUuid, NatIdField, RegkeyField, NameField, NameWithSpaceField, ModeField, DefaultActionField, ActionField, UuidField, ValueField, UrlField, DescriptionField, SourceNetworkField
+from .object_mixins import _FmcApiObject, AcpNameToUuid, NatIdField, RegkeyField, NameField, NameWithSpaceField, ModeField, DefaultActionField, ActionField, UuidField, ValueField, UrlField, DescriptionField, SourceNetworkField, DestNetworkField, HostnameField, InterfaceModeField
 
 
-class SecurityZone(ModeField, NameField, DescriptionField, _FmcApiObject):
+class SecurityZone(ModeField, NameField, InterfaceModeField, DescriptionField, _FmcApiObject):
     """
     Need: name, mode
     Optional: desc
@@ -27,7 +27,7 @@ class SecurityZone(ModeField, NameField, DescriptionField, _FmcApiObject):
     """
 
 
-class NetworkObject(ModeField, NameField, UuidField, ValueField, _FmcApiObject):
+class NetworkObject(ModeField, NameField, UuidField, DescriptionField, ValueField, _FmcApiObject):
     """
     Need: name, value
     Optional: desc
@@ -39,17 +39,8 @@ class NetworkObject(ModeField, NameField, UuidField, ValueField, _FmcApiObject):
         if self.name and self.value:
             return True
 
-    """
-        json_data = {
-            'name': obj['name'],
-            'value': obj['value'],
-            'description': obj['desc'],
-            'type': 'Network',
-        }
-    """
 
-
-class UrlObject(NameWithSpaceField, UuidField, UrlField, _FmcApiObject):
+class UrlObject(NameWithSpaceField, DescriptionField, ValueField, UuidField, UrlField, _FmcApiObject):
     """
     Need: name, value (AKA URL)
     Optional: desc
@@ -58,20 +49,11 @@ class UrlObject(NameWithSpaceField, UuidField, UrlField, _FmcApiObject):
     api_url = 'object/urls'
 
     def valid_for_post(self):
-        if self.name and self.api_url:
+        if self.name and self.url:
             return True
 
-    """
-            json_data = {
-                'name': obj['name'],
-                'url': obj['value'],
-                'description': obj['desc'],
-                'type': 'Url',
-            }
-    """
 
-
-class AccessControlPolicy(NameWithSpaceField, UuidField, DefaultActionField, _FmcApiObject):
+class AccessControlPolicy(NameWithSpaceField, UuidField, DescriptionField, DefaultActionField, _FmcApiObject):
     """
     Needs: name, defaultaction
     Optional: desc
@@ -93,7 +75,7 @@ class AccessControlPolicy(NameWithSpaceField, UuidField, DefaultActionField, _Fm
     """
 
 
-class AccessControlPolicyRule(NameWithSpaceField, UuidField, SourceNetworkField, ActionField, AcpNameToUuid, _FmcApiObject):
+class AccessControlPolicyRule(NameWithSpaceField, UuidField, SourceNetworkField, DestNetworkField, ActionField, AcpNameToUuid, _FmcApiObject):
     """
     Needs: name, action, acpuuid
     Optional: enabled, sendeventstofmc, logbegin, logend, ipspolicy, sourcezone, destzone, sourcenetwork, destnetwork, and many more!!!
@@ -119,7 +101,7 @@ class AccessControlPolicyRule(NameWithSpaceField, UuidField, SourceNetworkField,
             return True
 
 
-class Device(NameWithSpaceField, UuidField, RegkeyField, AcpNameToUuid, NatIdField, _FmcApiObject):
+class Device(NameWithSpaceField, UuidField, RegkeyField, HostnameField, AcpNameToUuid, NatIdField, _FmcApiObject):
     """
     Needs: name, regkey, acpuuid
     Optional: license_caps, hostname

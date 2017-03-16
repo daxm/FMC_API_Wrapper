@@ -78,7 +78,7 @@ class DescriptionField(object):
     Used in many of the Objects and Policies.  References the keyword "description".
     """
 
-    _description = "Created by API."
+    _description = None
     _description_field = 'description'
 
     def __init__(self, *args, **kwargs):
@@ -149,7 +149,7 @@ class NameField(object):
     """
 
     NAME_VALUES = "^[\w\d][.\w\d_\-]*$"
-    ERROR_MESSAGE = "Only alpha-numeric, underscrore and hyphen characters are permitted: %s"
+    ERROR_MESSAGE = "Only alpha-numeric, underscore and hyphen characters are permitted: %s"
 
     _name = None
     _name_field = 'name'
@@ -176,7 +176,34 @@ class NameWithSpaceField(NameField):
     """ 
 
     NAME_VALUES = "^[\w\d][.\w\d_\- ]*$"
-    ERROR_MSG = "Only alpha-numeric, underscrore, hyphen, and space characters are permitted"
+    ERROR_MSG = "Only alpha-numeric, underscore, hyphen, and space characters are permitted"
+
+
+class HostnameField(object):
+    """
+    "hostName" is used throughout many Objects and Policies.
+    """
+
+    HOSTNAME_VALUES = "^[\w\d][.\w\d_\- ]*$"
+    ERROR_MESSAGE = "Only alpha-numeric, underscore, hyphen and space characters are permitted: %s"
+
+    _hostname = None
+    _hostname_field = 'hostname'
+
+    def __init__(self, *args, **kwargs):
+        if self._hostname_field in kwargs:
+            self.hostname = kwargs[self._hostname_field]
+        super().__init__(self, *args, **kwargs)
+
+    @property
+    def hostname(self):
+        return self._hostname
+
+    @hostname.setter
+    def hostname(self, hostname):
+        if not re.match(self.HOSTNAME_VALUES, hostname):
+            raise Exception(self.ERROR_MESSAGE % hostname)
+        self._hostname = hostname
 
 
 class ModeField(object):
@@ -202,6 +229,32 @@ class ModeField(object):
         if mode not in self._MODE_CHOICES:
             raise Exception('Mode must be one of the following: "%s".' % (", ".join(self._MODE_CHOICES)))
         self._mode = mode
+
+
+class InterfaceModeField(object):
+    """
+    "interfaceMode"
+    """
+
+    _INTERFACE_MODE_CHOICES = ['PASSIVE', 'INLINE', 'SWITCHED', 'ROUTED', 'ASA']
+    _interfaceMode = None
+    _interfaceMode_field = 'interfaceMode'
+
+    def __init__(self, *args, **kwargs):
+        if self._interfaceMode_field in kwargs:
+            self.interfaceMode = kwargs[self._interfaceMode_field]
+        super().__init__(self, *args, **kwargs)
+
+    @property
+    def interfaceMode(self):
+        return self._mode
+
+    @interfaceMode.setter
+    def interfaceMode(self, interfaceMode):
+        if interfaceMode not in self._INTERFACE_MODE_CHOICES:
+            raise Exception('interfaceMode must be one of the following: "%s".' % (", ".join(self._INTERFACE_MODE_CHOICES)))
+        self._interfaceMode = interfaceMode
+
 
 
 class DefaultActionField(object):
@@ -338,3 +391,23 @@ class SourceNetworkField(object):
     @sourceNetwork.setter
     def sourceNetwork(self, sourceNetwork):
         self._sourceNetwork = sourceNetwork
+
+class DestNetworkField(object):
+    """
+    """
+    _destNetwork = None
+    _destNetwork_field = 'destNetwork'
+
+    def __init__(self, *args, **kwargs):
+        if self._destNetwork_field in kwargs:
+            self.destNetwork = kwargs[self._destNetwork_field]
+        super().__init__(self, *args, **kwargs)
+
+    @property
+    def destNetwork(self):
+        return self._destNetwork
+
+    @destNetwork.setter
+    def destNetwork(self, destNetwork):
+        self._destNetwork = destNetwork
+
