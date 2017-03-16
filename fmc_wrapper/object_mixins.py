@@ -35,10 +35,12 @@ class _FmcApiObject(object):
             p for p in dir(self.__class__)
                 if isinstance(getattr(self.__class__, p), property)
             ]
-        return_values = {}
-        for thing in property_names:
-            return_values.update({thing:getattr(self,thing)})
-        return json.dumps(return_values)
+        prop_dict = {}
+        for prop in property_names:
+            val = getattr(self, prop)
+            if val:
+                prop_dict[prop] = val
+        return json.dumps(prop_dict)
 
     @classmethod
     def from_json(cls, json_str):
@@ -210,7 +212,7 @@ class DefaultActionField(object):
     DEFAULT_ACTION_CHOICES = ['BLOCK', 'PERMIT', 'TRUST', 'MONITOR', 'BLOCK_WITH_RESET', 'INTERACTIVE_BLOCK', 'INTERACTIVE_BLOCK_WITH_RESET', 'NETWORK_DISCOVERY', 'IPS_ACTION', 'FASTPATH']
 
     _defaultaction = None
-    _defaultaction_field = 'defaultaction'
+    _defaultaction_field = 'defaultAction'
 
     def __init__(self, *args, **kwargs):
         if self._defaultaction_field in kwargs:
@@ -258,7 +260,7 @@ class AcpNameToUuid(object):
     Take an ACP name and return its UUID.
     """
     _acpuuid = None
-    _acpuuid_field = 'acpname'
+    _acpuuid_field = 'acpName'
 
     def __init__(self, *args, **kwargs):
         if self._acpuuid_field in kwargs:

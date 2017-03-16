@@ -3,7 +3,7 @@
 from fmc_wrapper import *
 
 
-print(SecurityZone(name='IN', description='Inside Security Zone created by API', mode='ROUTED'))
+#print(SecurityZone(name='IN', description='Inside Security Zone created by API', mode='ROUTED'))
 # print(SecurityZone(name='_IN', description='Inside Security Zone created by API', mode='ROUTED'))
 # print(SecurityZone(name='IN ', description='Inside Security Zone created by API', mode='ROUTED'))
 # print(SecurityZone(name='IN', mode='ROUTED'))
@@ -23,7 +23,6 @@ json_data = """{
 
 sz = SecurityZone.from_json(json_data)
 print(sz)
-exit()
 
 # ############################# User Created Variables to be used below functions ############################
 # FMC Server Info.
@@ -33,18 +32,18 @@ password = 'C1sco12345'
 
 # The example values shown here are from "FTD Basics" lab that is hosted on dCloud.
 accesscontrolpolicies = [
-    AccessControlPolicy(name='Base', defaultaction='BLOCK'),
-    AccessControlPolicy(name='HQ', defaultaction='BLOCK'),
-    AccessControlPolicy(name='Remote Locations', defaultaction='BLOCK'),
+    AccessControlPolicy(name='Base', defaultAction='BLOCK'),
+    AccessControlPolicy(name='HQ', defaultAction='BLOCK'),
+    AccessControlPolicy(name='Remote Locations', defaultAction='BLOCK'),
 ]
 
 accesscontrolpolicyrules = [
-    AccessControlPolicyRule(name='INET Access', acpname='Base', action='PERMIT', sourcenetwork='HQLAN', destnetwork='any-ipv4'),
-    AccessControlPolicyRule(name='Access FMC', acpname='HQ', action='PERMIT', sourcenetwork='any-ipv4', destnetwork='FMC_Private'),
-    AccessControlPolicyRule(name='Block Facebook', acpname='Base', action='BLOCK', sourcenetwork='ExampleCorpLANs', destnetwork='any-ipv4', urlobject='Facebook'),
-    AccessControlPolicyRule(name='Permit Facebook', acpname='HQ', action='PERMIT', sourcenetwork='HQLAN', destnetwork='any-ipv4', urlobject='Facebook'),
-    AccessControlPolicyRule(name='Block gambling.com', acpname='Base', action='BLOCK', sourcenetwork='ExampleCorpLANs', destnetwork='any-ipv4', urlobject='gambling.com'),
-    AccessControlPolicyRule(name='Block 888.com', acpname='Base', action='BLOCK', sourcenetwork='ExampleCorpLANs', destnetwork='any-ipv4', urlobject='888.com'),
+    AccessControlPolicyRule(name='INET Access', acpname='Base', action='ALLOW', sourceNetwork='HQLAN', destNetwork='any-ipv4'),
+    AccessControlPolicyRule(name='Access FMC', acpname='HQ', action='ALLOW', sourceNetwork='any-ipv4', destNetwork='FMC_Private'),
+    AccessControlPolicyRule(name='Block Facebook', acpname='Base', action='BLOCK', sourceNetwork='ExampleCorpLANs', destNetwork='any-ipv4', urlObject='Facebook'),
+    AccessControlPolicyRule(name='Permit Facebook', acpname='HQ', action='ALLOW', sourceNetwork='HQLAN', destNetwork='any-ipv4', urlObject='Facebook'),
+    AccessControlPolicyRule(name='Block gambling.com', acpname='Base', action='BLOCK', sourceNetwork='ExampleCorpLANs', destNetwork='any-ipv4', urlObject='gambling.com'),
+    AccessControlPolicyRule(name='Block 888.com', acpname='Base', action='BLOCK', sourceNetwork='ExampleCorpLANs', destNetwork='any-ipv4', urlObject='888.com'),
 ]
 
 devices = [
@@ -102,12 +101,5 @@ Examples of using this script:
 #    fmc1.put(NetworkObjects)
 #    fmc1.get(SecurityZones)
 
-"""
-uuidfield = UuidField()
-uuidfield.uuid = '123e4567-e89b-12d3-a456-426655440000'
-print(uuidfield.uuid)
-daxuuid = uuidfield.uuid
-print(daxuuid)
-"""
-for sz in securityzones:
+for sz in (securityzones + accesscontrolpolicies + accesscontrolpolicyrules + devices + networkobjects + urlobjects):
     print(sz)

@@ -99,7 +99,7 @@ class AccessControlPolicyRule(NameWithSpaceField, UuidField, ActionField, AcpNam
     Optional: enabled, sendeventstofmc, logbegin, logend, ipspolicy, sourcezone, destzone, sourcenetwork, destnetwork, and many more!!!
     """
 
-    type = 'AccessRule'
+    _type = 'AccessRule'
     acpuuid = ''
     api_url = 'policy/accesspolicies/' + acpuuid + 'accessrules'
 
@@ -124,7 +124,7 @@ class Device(NameWithSpaceField, UuidField, RegkeyField, AcpNameToUuid, NatIdFie
     Needs: name, regkey, acpuuid
     Optional: license_caps, hostname
     """
-    type = 'Device'
+    _type = 'Device'
     api_url = 'devices/devicerecords'
 
     def valid_for_post(self):
