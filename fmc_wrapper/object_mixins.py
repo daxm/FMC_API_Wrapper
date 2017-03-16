@@ -316,7 +316,7 @@ class NatIdField(object):
     def natId(self):
         return self._natId
 
-    @natid.setter
+    @natId.setter
     def natId(self, natId):
         self._natId = natId
 
