@@ -186,7 +186,7 @@ class FMC(object):
                     "interfaceMode": zone['mode'],
                 }
                 response = self.postdata(url, json_data)
-                if response.get('id', '') is not '':
+                if response.get('id', ''):
                     zone['id'] = response['id']
                     print("\tSecurity Zone", zone['name'], "created.")
 
@@ -201,7 +201,7 @@ class FMC(object):
                     'type': 'Network',
                 }
                 response = self.postdata(url, json_data)
-                if response.get('id', '') is not '':
+                if response.get('id', ''):
                     obj['id'] = response['id']
                     print("\tNetwork Object", obj['name'], "created.")
 
@@ -216,7 +216,7 @@ class FMC(object):
                     'type': 'Url',
                 }
                 response = self.postdata(url, json_data)
-                if response.get('id', '') is not '':
+                if response.get('id', ''):
                     obj['id'] = response['id']
                     print("\tURL Object", obj['name'], "created.")
 
@@ -229,7 +229,7 @@ class FMC(object):
                     'name': policy['name'],
                     'description': policy['desc'],
                 }
-                if False and policy.get('parent', '') is not '':
+                if False and policy.get('parent', ''):
                     # Modifying Metatdata is not supported so we cannot create "child" ACPs yet.  :-(
                     url_search = url + "?name=" + policy['parent']
                     response = self.getdata(url_search)
@@ -244,7 +244,7 @@ class FMC(object):
                 else:
                     json_data['defaultAction'] = {'action': policy['defaultAction']}
                 response = self.postdata(url, json_data)
-                if response.get('id', '') is not '':
+                if response.get('id', ''):
                     policy['id'] = response['id']
                     print("\tAccess Control Policy", policy['name'], "created.")
 
@@ -271,7 +271,7 @@ class FMC(object):
                 'logBegin': rule['logBegin'],
                 'logEnd': rule['logEnd'],
             }
-            if rule.get('ipsPolicy', '') is not '':
+            if rule.get('ipsPolicy', ''):
                 # Currently you cannot query IPS Policies by name.  I'll have to grab them all and filter from there.
                 url_search = "/policy/intrusionpolicies"
                 response = self.getdata(url_search)
@@ -287,45 +287,45 @@ class FMC(object):
                         'id': ips_policy_id,
                         'type': 'IntrusionPolicy'
                     }
-            if rule.get('sourceZones', '') is not '':
+            if rule.get('sourceZones', ''):
                 # NOTE: There can be more than one sourceZone so we need to account for them all.
                 securityzone_ids = []
                 for zone in rule['sourceZones']:
                     url_search = "/object/securityzones" + "?name=" + zone['name']
                     response = self.getdata(url_search)
-                    if response.get('items', '') is '':
-                        print("Security Zone", zone['name'], "is not found.  Skipping this zone.")
-                    else:
+                    if response.get('items', ''):
                         tmp = {
                             'name': zone['name'],
                             'id': response['items'][0]['id'],
                             'type': 'SecurityZone'
                         }
                         securityzone_ids.append(tmp)
+                    else:
+                        print("Security Zone", zone['name'], "is not found.  Skipping this zone.")
                 if len(securityzone_ids) > 0:
                     json_data['sourceZones'] = {
                         'objects': securityzone_ids
                     }
-            if rule.get('destinationZones', '') is not '':
+            if rule.get('destinationZones', ''):
                 # NOTE: There can be more than one destinationZone so we need to account for them all.
                 securityzone_ids = []
                 for zone in rule['destinationZones']:
                     url_search = "/object/securityzones" + "?name=" + zone['name']
                     response = self.getdata(url_search)
-                    if response.get('items', '') is '':
-                        print("Security Zone", zone['name'], "is not found.  Skipping this zone.")
-                    else:
+                    if response.get('items', ''):
                         tmp = {
                             'name': zone['name'],
                             'id': response['items'][0]['id'],
                             'type': 'SecurityZone'
                         }
                         securityzone_ids.append(tmp)
+                    else:
+                        print("Security Zone", zone['name'], "is not found.  Skipping this zone.")
                 if len(securityzone_ids) > 0:
                     json_data['destinationZones'] = {
                         'objects': securityzone_ids
                     }
-            if rule.get('sourceNetworks', '') is not '':
+            if rule.get('sourceNetworks', ''):
                 # Currently you cannot query Network Objects by name.  I'll have to grab them all and filter from there.
                 url_search = "/object/networks"
                 # Grab a copy of the current Network Objects on the server and we will cycle through these for each
@@ -351,7 +351,7 @@ class FMC(object):
                     json_data['sourceNetworks'] = {
                         'objects': network_obj_ids
                     }
-            if rule.get('destinationNetworks', '') is not '':
+            if rule.get('destinationNetworks', ''):
                 # Currently you cannot query Network Objects by name.  I'll have to grab them all and filter from there.
                 url_search = "/object/networks"
                 # Grab a copy of the current Network Objects on the server and we will cycle through these for each
@@ -380,7 +380,7 @@ class FMC(object):
             # Update URL to be specific to this ACP's ruleset.
             url = "/policy/accesspolicies/" + acp_id + "/accessrules"
             response = self.postdata(url, json_data)
-            if response.get('id', '') is not '':
+            if response.get('id', ''):
                 rule['id'] = response['id']
                 print("\tACP Rule", rule['name'], "created.")
 
@@ -398,7 +398,7 @@ class FMC(object):
             # Get ACP's ID for this rule
             url_search = "/policy/accesspolicies" + "?name=" + device['acpName']
             response = self.getdata(url_search)
-            if response.get('items', '') is '':
+            if not response.get('items', ''):
                 print("Access Control Policy not found. Exiting.")
                 continue
             json_data['accessPolicy'] = {
@@ -408,7 +408,7 @@ class FMC(object):
             }
             url = "/devices/devicerecords"
             response = self.postdata(url, json_data)
-            if response.get('metadata', '') is not '':
+            if response.get('metadata', ''):
                 print("\tDevice registration can take some time (5 minutes or more).")
                 print("\t\tIssue the command 'show managers' on", device['name'], "to view progress.")
 
@@ -464,7 +464,7 @@ class FMC(object):
                                 'ipv4': device['ipv4'],
                             }
                     response = self.putdata(url, json_data)
-                    if response.get('metadata', '') is not '':
+                    if response.get('metadata', ''):
                         print("\tInterface", device['name'], "on device", attribute['deviceName'], "has been modified.")
                     else:
                         print("\tSomething wrong happened when modifying interface", device['name'], "on device", attribute['deviceName'])
