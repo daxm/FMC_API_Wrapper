@@ -2,33 +2,11 @@
 
 from fmc_wrapper import *
 
-
-#print(SecurityZone(name='IN', description='Inside Security Zone created by API', mode='ROUTED'))
-# print(SecurityZone(name='_IN', description='Inside Security Zone created by API', mode='ROUTED'))
-# print(SecurityZone(name='IN ', description='Inside Security Zone created by API', mode='ROUTED'))
-# print(SecurityZone(name='IN', mode='ROUTED'))
-# print(SecurityZone(name='IN', description='Inside Security Zone created by API', mode='RUTED'))
-# print(SecurityZone(name='IN', description='Inside Security Zone created by API', mode='TRANSPARENT'))
-# print(SecurityZone(name='OUT', description='Outside Security Zone created by API', mode='TRANSPARENT'))
-# print(dir(SecurityZone))
-# help(SecurityZone)
-
-json_data = """{
-  "name": "SecurityZoneObject5",
-  "description": "Sec-zone-UUID-1",
-  "type": "SecurityZone",
-  "mode": "ROUTED"
-}
-"""
-
-sz = SecurityZone.from_json(json_data)
-print(sz)
-
 # ############################# User Created Variables to be used below functions ############################
 # FMC Server Info.
-serverIP = '172.16.100.100'
+serverIP = '64.100.10.13'
 username = 'apiadmin'
-password = 'C1sco12345'
+password = 'Admin123'
 
 # The example values shown here are from "FTD Basics" lab that is hosted on dCloud.
 accesscontrolpolicies = [
@@ -37,6 +15,7 @@ accesscontrolpolicies = [
     AccessControlPolicy(name='Remote Locations', defaultAction='BLOCK'),
 ]
 
+"""
 accesscontrolpolicyrules = [
     AccessControlPolicyRule(name='INET Access', acpname='Base', action='ALLOW', sourceNetwork='HQLAN', destNetwork='any-ipv4'),
     AccessControlPolicyRule(name='Access FMC', acpname='HQ', action='ALLOW', sourceNetwork='any-ipv4', destNetwork='FMC_Private'),
@@ -51,6 +30,7 @@ devices = [
     Device(name='REMOTE1-FTD', hostname='198.18.2.10', acpname='Remote Locations', regkey='cisco123', natid='12345', license_caps=['MALWARE', 'URLFilter', 'THREAT']),
     Device(name='REMOTE2-FTD', acpname='Remote Locations', regkey='cisco123', natid='a1b2', license_caps=['MALWARE', 'URLFilter', 'THREAT']),
 ]
+"""
 
 networkobjects = [
     NetworkObject(name='HQLAN', value='172.16.100.0/24'),
@@ -79,7 +59,9 @@ urlobjects = [
 
 # ################################ Main Program Logic Below Here #####################
 
-# with FMC(serverIP,username,password,autodeploy='False') as fmc1:
+with FMC(serverIP,username,password,autodeploy=False) as fmc1:
+    pass
+
 """
 Recommended order to do things: delete, post, put, get
 Also, order in which you do things is important.  Don't try to add an Access Control Policy Rule before you
@@ -101,5 +83,5 @@ Examples of using this script:
 #    fmc1.put(NetworkObjects)
 #    fmc1.get(SecurityZones)
 
-for sz in (securityzones + accesscontrolpolicies + accesscontrolpolicyrules + devices + networkobjects + urlobjects):
-    print(sz)
+# for sz in (securityzones + accesscontrolpolicies + accesscontrolpolicyrules + devices + networkobjects + urlobjects):
+#    print(sz)

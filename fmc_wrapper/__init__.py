@@ -40,15 +40,17 @@ class FMC(object):
     def __exit__(self, *args):
         if self.autodeploy:
             self.deploychanges()
+        else:
+            print('Auto Deploy is disabled.  Set "autodeploy=True" if you want this script to push changes to its managed devices.')
 
     def reset_token_expiry(self):
-        self.token_expiry = datetime.datetime.now() + datetime.timedelta(seconds=TOKEN_LIFETIME)
+        self.token_expiry = datetime.datetime.now() + datetime.timedelta(seconds=self.TOKEN_LIFETIME)
 
     def refresh_token(self):
-        headers = {'Content-Type': 'application/json', 'X-auth-access-token': self.token, 'X-auth-refresh-token': self.refreshtoken }
-        url = "https://" + self.host + self.API_VERSION + "auth/refreshtoken"
-        print("Refreshing token from %s." % url)
-        response = requests.post(url, headers=headers, verify=self.VERIFY_CERT)
+        self.headers = {'Content-Type': 'application/json', 'X-auth-access-token': self.token, 'X-auth-refresh-token': self.refreshtoken }
+        self.url = "https://" + self.host + self.API_VERSION + "auth/refreshtoken"
+        print("Refreshing token from %s." % self.url)
+        response = requests.post(self.url, headers=self.headers, verify=self.VERIFY_CERT)
         self.token_refreshes += 1
         self.reset_token_expiry()
         self.token = self.headers.get('X-auth-access-token')
@@ -58,14 +60,14 @@ class FMC(object):
     def connect(self):
         # define fuction to connect to the FMC API and generate authentication token
         # Token is good for 30 minutes.
-        headers = {'Content-Type': 'application/json'}
-        url = "https://" + self.host + self.API_VERSION + "auth/generatetoken"
-        print("Requesting token from %s." % url)
-        response = requests.post(url, headers=headers, auth=requests.auth.HTTPBasicAuth(self.username, self.password), verify=self.VERIFY_CERT)
+        self.headers = {'Content-Type': 'application/json'}
+        self.url = "https://" + self.host + self.API_VERSION + "auth/generatetoken"
+        print("Requesting token from %s." % self.url)
+        self.response = requests.post(self.url, headers=self.headers, auth=requests.auth.HTTPBasicAuth(self.username, self.password), verify=self.VERIFY_CERT)
 
-        self.token = self.headers.get('X-auth-access-token')
-        self.refreshtoken = self.headers.get('X-auth-refresh-token')
-        self.uuid = self.headers.get('DOMAIN_UUID')
+        self.token = self.response.headers.get('X-auth-access-token')
+        self.refreshtoken = self.response.headers.get('X-auth-refresh-token')
+        self.uuid = self.response.headers.get('DOMAIN_UUID')
         if self.token is None or self.uuid is None:
             print("No Token or DOMAIN_UUID found, terminating....")
             sys.exit()
@@ -74,7 +76,7 @@ class FMC(object):
         self.reset_token_expiry()
         self.token_refreshes = 0
             
-        print("Token creation a success -->", token, "which expires ", self.token_expiry)
+        print("Token creation a success -->", self.token, "which expires ", self.token_expiry)
 
     def checktoken(self):
         if datetime.datetime.now() > self.token_expiry:

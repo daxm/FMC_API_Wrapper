@@ -208,7 +208,6 @@ class InterfaceModeField(object):
         self._interfaceMode = interfaceMode
 
 
-
 class DefaultActionField(object):
     """
     "defaultaction" is used as the keyword in specifying the Default Action of an Access Control Policy.
@@ -304,6 +303,7 @@ class NatIdField(object):
     def natId(self, natId):
         self._natId = natId
 
+
 class SourceNetworkField(object):
     """
     """
@@ -316,6 +316,7 @@ class SourceNetworkField(object):
     @sourceNetwork.setter
     def sourceNetwork(self, sourceNetwork):
         self._sourceNetwork = sourceNetwork
+
 
 class DestNetworkField(object):
     """
