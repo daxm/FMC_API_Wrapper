@@ -200,7 +200,7 @@ class FMC(object):
                     break
             else:
                 # Enter here is "getall" is requested.  (Which is essentially if 'id' nor 'name' are present.)
-                
+                self.accumulated_results.append(results)
         return self.accumulated_results
 
     def configure(self, users_objects):
