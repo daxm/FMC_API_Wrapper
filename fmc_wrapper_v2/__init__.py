@@ -159,3 +159,39 @@ class FMC(object):
         if response:
             response.close()
         return json_response
+
+    def configure(self, users_objects):
+        for obj in users_objects:
+            do_action = False
+            if obj.method == 'post':
+                if obj.valid_for_post:
+                    do_action = True
+            elif obj.method == 'get':
+                if 'name' in obj.__dict__:
+                    """
+                    Alas, you have to "getall" and parse through looking for the specific entry to get the ID.
+                    Then you have to use "get" using the ID.
+                    """
+                    results = self.send(method='get', url=obj.api_url, json_data='')
+                    for item in results['items']:
+                        if item['name'] == obj.name:
+                            obj.id = item['id']
+                    if 'id' not in obj.__dict__:
+                        print("ERROR: Cannot find item with name {} in {}.".format(obj.name, obj.__class__))
+                    else:
+                        do_action = True
+                else:
+                    do_action = True
+            elif obj.method == 'put':
+                if obj.valid_for_put:
+                    do_action = True
+            elif obj.method == 'delete':
+                if 'name' in obj.__dict__:
+                    pass
+                if obj.valid_for_delete:
+                    do_action = True
+            if do_action:
+                results = self.send(method=obj.method, url=obj.api_url, json_data=obj.build_dict())
+                print("Method:{}, Results:{}\n".format(obj.method, results))
+            else:
+                print('ERROR: Method: "{}" failed to run for {}\n'.format(obj.method, obj.__class__))

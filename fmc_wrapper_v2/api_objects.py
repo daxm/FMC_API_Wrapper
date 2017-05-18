@@ -5,7 +5,7 @@ All the API objects that I support will have a class in this file.
 """
 
 
-class NetworkObject:
+class Network:
     """
     Build a NetworkObject instance, sanitize its inputs (per what the FMC API will accept).
     """
@@ -99,11 +99,7 @@ class NetworkObject:
             print('ERROR: The id variable is required to DELETE.')
             return False
 
-    @property
-    def valid_for_getall(self):
-        return True
-
-    def create_json(self):
+    def build_dict(self):
         # Build a valid JSON formatted data string in preparation to being sent to the FMC.
         my_dict = {}
         my_dict['type'] = self.api_type
@@ -118,6 +114,3 @@ class NetworkObject:
         if 'id' in self.__dict__:
             my_dict['id'] = self.id
         return my_dict
-
-    def get_id(self):
-        pass
