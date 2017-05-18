@@ -69,6 +69,8 @@ class Network:
 
         if 'method' in kwargs:
             self.method = kwargs['method']
+        else:
+            self.method = 'get'
 
     @property
     def valid_for_post(self):
@@ -113,4 +115,8 @@ class Network:
             my_dict['name'] = self.name
         if 'id' in self.__dict__:
             my_dict['id'] = self.id
+        if 'metadata' in self.__dict__:
+            my_dict['metadata'] = self.metadata
+        if 'links' in self.__dict__:
+            my_dict['links'] = self.links
         return my_dict
