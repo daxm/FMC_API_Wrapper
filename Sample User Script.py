@@ -60,7 +60,7 @@ urlobjects = [
 # ################################ Main Program Logic Below Here #####################
 
 with FMC(serverIP,username,password,autodeploy=False) as fmc1:
-    pass
+    fmc1.get(urlobjects)
 
 """
 Recommended order to do things: delete, post, put, get

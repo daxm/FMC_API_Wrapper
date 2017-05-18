@@ -1,4 +1,5 @@
 from .decorate import logger, syntax_correcter
+import json
 
 """
 All the API objects that I support will have a class in this file.
@@ -12,6 +13,35 @@ class NetworkObject:
 
     api_type = 'Network'
     api_url = 'object/networks'
+    # Here is the rough format of the 'exanded=true' output from the FMC NetworkObject GET request.
+    template_dict = {
+        'links': {
+            'self': None,
+            'parent': None
+        },
+        'type': None,
+        'value': None,
+        'overridable': None,
+        'description': None,
+        'name': None,
+        'id': None,
+        'metadata': {
+            'readOnly': {
+                'state': None,
+                'reason': None,
+            },
+            'timestamp': None,
+            'lastUser': {
+                'name': None,
+            },
+            'domain': {
+                'name': None,
+                'id': None,
+            },
+            'ipType': None,
+            'parentType': None,
+        },
+    }
 
     def __init__(self, **kwargs):
         # Cycle through kwargs and, if available, assign to instance variables.
@@ -23,8 +53,6 @@ class NetworkObject:
 
         if 'overridable' in kwargs:
             self.overridable = kwargs['overridable']
-        else:
-            self.overridable = False
 
         if 'description' in kwargs:
             self.description = kwargs['description']
@@ -32,7 +60,7 @@ class NetworkObject:
             self.description = 'Created via API.'
 
         if 'name' in kwargs:
-            self.name = syntax_correcter(kwargs['name'], permitted_syntax="[.\w\d_\- ]")
+            self.name = syntax_correcter(kwargs['name'])
 
         if 'id' in kwargs:
             self.id = kwargs['id']
@@ -40,10 +68,61 @@ class NetworkObject:
         if 'metadata' in kwargs:
             self.metadata = kwargs['metadata']
 
+        if 'method' in kwargs:
+            self.method = kwargs['method']
+        else:
+            self.method = 'getall'
+
     @property
     def valid_for_post(self):
-        # The variables 'name' and 'value' are required to POST.
         if 'name' in dir(self) and 'value' in dir(self):
             return True
         else:
+            print('ERROR: The name and value variables are required to POST.')
             return False
+
+    @property
+    def valid_for_get(self):
+        if 'id' in dir(self):
+            return True
+
+    @property
+    def valid_for_put(self):
+        if 'id' in dir(self):
+            return True
+        else:
+            print('ERROR: The id variable is required to PUT.')
+            return False
+
+    @property
+    def valid_for_delete(self):
+        if 'id' in dir(self):
+            return True
+        else:
+            print('ERROR: The id variable is required to DELETE.')
+            return False
+
+    @property
+    def valid_for_getall(self):
+        return True
+
+    def create_json(self):
+        # Build a valid JSON formatted data string in preparation to being sent to the FMC.
+        my_dict = {}
+        my_dict['type'] = self.api_type
+        if 'value' in dir(self):
+            my_dict['value'] = self.value
+        if 'overridable' in dir(self):
+            my_dict['overridable'] = self.overridable
+        if 'description' in dir(self):
+            my_dict['description'] = self.description
+        if 'name' in dir(self):
+            my_dict['name'] = self.name
+        if 'id' in dir(self):
+            my_dict['id'] = self.id
+        return json.dumps(my_dict)
+
+    def get_id(self):
+
+
+

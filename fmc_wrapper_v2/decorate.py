@@ -1,6 +1,7 @@
 from functools import wraps
 import re
 
+
 def logger(orig_function):
     """
     Create/Modify a log file with the name of the orig_function.
@@ -52,7 +53,8 @@ def syntaxcheck_name(orig_function):
 
     return wrapper
 
-def syntax_checker(value, permitted_syntax = "^[\w\d][.\w\d_\-]*$"):
+
+def syntax_checker(value, permitted_syntax="^[\w\d][.\w\d_\-]*$"):
     """
     Checks the value variable for permitted_syntax values.  If it fails, print an error and return False, otherwise
     return True.
@@ -67,8 +69,8 @@ def syntax_checker(value, permitted_syntax = "^[\w\d][.\w\d_\-]*$"):
     else:
         return True
 
-@logger
-def syntax_correcter(value, permitted_syntax = "[.\w\d_\-]", replacer = '_'):
+
+def syntax_correcter(value, permitted_syntax="[.\w\d_\-]", replacer='_'):
     """
     Check 'value' for invalid characters (identified by 'permitted_syntax') and replace them with 'replacer'.
     :param value:  String to be checked.

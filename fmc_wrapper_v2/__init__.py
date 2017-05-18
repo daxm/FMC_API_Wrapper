@@ -1,12 +1,10 @@
+
 import datetime
-import json
 import requests
 import sys
 import time
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .api_objects import *
-
-
 
 """
 Firepower Management Center API wrapper class for managing Firepower Threat Defense and legacy Firepower devicesthrough a Firepower Management Center
@@ -18,9 +16,10 @@ http://www.cisco.com/c/en/us/td/docs/security/firepower/610/api/REST/Firepower_R
 
 class FMC(object):
     """
-    FMC objects
+    This class contains the methods used when interacting with the FMC.
+    Mainly around establishing and maintaining the connection and performing any Method actions (get, put, post, delete).
     """
-    
+
     API_PLATFORM_VERSION = '/api/fmc_platform/v1/'
     API_CONFIG_VERSION = '/api/fmc_config/v1/'
     VERIFY_CERT = False
@@ -31,6 +30,14 @@ class FMC(object):
         self.username = username
         self.password = password
         self.autodeploy = autodeploy
+
+        self.headers = {'Content-Type': 'application/json'}
+        self.token_expiry = None
+        self.token = None
+        self.refreshtoken = None
+        self.token_refreshes = None
+        self.uuid = None
+        self.base_url = None
 
         if not self.VERIFY_CERT:
             requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -44,16 +51,16 @@ class FMC(object):
             self.deploychanges()
         else:
             print('Auto Deploy is disabled.\n'
-                  'Set "autodeploy=True" if you want this script to push changes to its managed devices.')
+                  'Set "autodeploy=True" if you want this script to push changes to its managed devices.\n')
 
     def reset_token_expiry(self):
         self.token_expiry = datetime.datetime.now() + datetime.timedelta(seconds=self.TOKEN_LIFETIME)
 
     def refresh_token(self):
-        self.headers = {'Content-Type': 'application/json', 'X-auth-access-token': self.token, 'X-auth-refresh-token': self.refreshtoken }
-        self.url = "https://" + self.host + self.API_PLATFORM_VERSION + "auth/refreshtoken"
-        print("Refreshing token from %s." % self.url)
-        self.response = requests.post(self.url, headers=self.headers, verify=self.VERIFY_CERT)
+        self.headers = {'Content-Type': 'application/json', 'X-auth-access-token': self.token, 'X-auth-refresh-token': self.refreshtoken}
+        url = "https://" + self.host + self.API_PLATFORM_VERSION + "auth/refreshtoken"
+        print("Refreshing token from %s.\n" % url)
+        response = requests.post(url, headers=self.headers, verify=self.VERIFY_CERT)
         self.token_refreshes += 1
         self.reset_token_expiry()
         self.token = self.headers.get('X-auth-access-token')
@@ -63,84 +70,26 @@ class FMC(object):
     def connect(self):
         # define fuction to connect to the FMC API and generate authentication token
         # Token is good for 30 minutes.
-        self.headers = {'Content-Type': 'application/json'}
-        self.url = "https://" + self.host + self.API_PLATFORM_VERSION + "auth/generatetoken"
-        print("Requesting token from %s." % self.url)
-        self.response = requests.post(self.url, headers=self.headers, auth=requests.auth.HTTPBasicAuth(self.username, self.password), verify=self.VERIFY_CERT)
+        url = "https://" + self.host + self.API_PLATFORM_VERSION + "auth/generatetoken"
+        print("Requesting token from %s." % url)
+        response = requests.post(url, headers=self.headers, auth=requests.auth.HTTPBasicAuth(self.username, self.password), verify=self.VERIFY_CERT)
 
-        self.token = self.response.headers.get('X-auth-access-token')
-        self.refreshtoken = self.response.headers.get('X-auth-refresh-token')
-        self.uuid = self.response.headers.get('DOMAIN_UUID')
+        self.token = response.headers.get('X-auth-access-token')
+        self.refreshtoken = response.headers.get('X-auth-refresh-token')
+        self.uuid = response.headers.get('DOMAIN_UUID')
         if self.token is None or self.uuid is None:
             print("No Token or DOMAIN_UUID found, terminating....")
             sys.exit()
-            
         self.base_url = "https://" + self.host + self.API_CONFIG_VERSION + "domain/" + self.uuid
         self.reset_token_expiry()
         self.token_refreshes = 0
             
-        print("Token creation a success -->", self.token, "which expires ", self.token_expiry)
+        print("Token creation a success -->", self.token, "which expires ", self.token_expiry, "\n")
 
     def checktoken(self):
         if datetime.datetime.now() > self.token_expiry:
-            print("Token Expired.  Generating new token.")
+            print("Token Expired.  Generating new token.\n")
             self.connect()
-
-    def get(self, obj_list):
-        self.checktoken()
-        # GET requested data and return it.
-        for object in obj_list:
-            try:
-                self.headers = {'Content-Type': 'application/json', 'X-auth-access-token': self.token}
-                self.url = self.base_url + "/" + object.api_url
-                self.response = requests.get(self.url, headers=self.headers, verify=self.VERIFY_CERT)
-                self.status_code = self.response.status_code
-                self.json_response = json.loads(self.response.text)
-                if self.status_code > 301 or 'error' in self.json_response:
-                    self.response.raise_for_status()
-            except requests.exceptions.HTTPError as err:
-                print("Error in GET operation -->", str(err))
-                print("json_response -->\t", self.json_response)
-            print(self.json_response)
-            if self.response:
-                self.response.close()
-            return self.json_response
-
-    def postdata(self, url, json_data):
-        self.checktoken()
-        # POST json_data with the REST CALL
-        try:
-            headers = {'Content-Type': 'application/json', 'X-auth-access-token': self.token}
-            url = self.base_url + url
-            response = requests.post(url, json=json_data, headers=headers, verify=self.VERIFY_CERT)
-            status_code = response.status_code
-            json_response = json.loads(response.text)
-            if status_code > 301 or 'error' in json_response:
-                response.raise_for_status()
-        except requests.exceptions.HTTPError as err:
-            print("Error in POST operation -->", str(err))
-            print("json_response -->\t", json_response)
-        if response:
-            response.close()
-        return json_response
-
-    def putdata(self, url, json_data):
-        self.checktoken()
-        # PUT json_data with the REST CALL
-        try:
-            headers = {'Content-Type': 'application/json', 'X-auth-access-token': self.token}
-            url = self.base_url + url
-            response = requests.put(url, json=json_data, headers=headers, verify=self.VERIFY_CERT)
-            status_code = response.status_code
-            json_response = json.loads(response.text)
-            if status_code > 301 or 'error' in json_response:
-                response.raise_for_status()
-        except requests.exceptions.HTTPError as err:
-            print("Error in PUT operation -->", str(err))
-            print("json_response -->\t", json_response)
-        if response:
-            response.close()
-        return json_response
 
     def getdeployabledevices(self):
         waittime = 15
@@ -148,7 +97,7 @@ class FMC(object):
         time.sleep(waittime)
         print("Getting a list of deployable devices.")
         url = "/deployment/deployabledevices?expanded=true"
-        response = self.getdata(url)
+        response = self.send(url=url, json_data='')
         # Now to parse the response list to get the UUIDs of each device.
         if 'items' not in response:
             return
@@ -178,6 +127,35 @@ class FMC(object):
             print("Adding device %s to deployment queue." % device)
             json_data['deviceList'].append(device)
         print("Deploying changes to devices.")
-        response = self.postdata(url, json_data)
+        response = self.send(url=url, json_data=json_data)
         return response['deviceList']
 
+    def send(self, **kwargs):
+        self.checktoken()
+        # POST json_data with the REST CALL
+        try:
+            headers = {'Content-Type': 'application/json', 'X-auth-access-token': self.token}
+            url = self.base_url + '/' + kwargs['url']
+
+            if kwargs['method'] == 'post':
+                response = requests.post(url, data=kwargs['json_data'], headers=headers, verify=self.VERIFY_CERT)
+            elif kwargs['method'] == 'get':
+                url = url + "/" + kwargs['id']
+                response = requests.get(url, headers=headers, verify=self.VERIFY_CERT)
+            elif kwargs['method'] == 'put':
+                pass
+            elif kwargs['method'] == 'delete':
+                pass
+            elif kwargs['method'] == 'getall':
+                response = requests.get(url, headers=headers, verify=self.VERIFY_CERT)
+
+            status_code = response.status_code
+            json_response = json.loads(response.text)
+            if status_code > 301 or 'error' in json_response:
+                response.raise_for_status()
+        except requests.exceptions.HTTPError as err:
+            print("Error in POST operation -->", str(err))
+            print("json_response -->\t", json_response)
+        if response:
+            response.close()
+        return json_response
