@@ -4,7 +4,9 @@ import sys
 import time
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import json
+from .helper_tools import *
 
+@logger
 class FMC(object):
     """
     This class contains the methods used when interacting with the FMC.
