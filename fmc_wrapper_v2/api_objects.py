@@ -69,12 +69,10 @@ class NetworkObject:
 
         if 'method' in kwargs:
             self.method = kwargs['method']
-        else:
-            self.method = 'getall'
 
     @property
     def valid_for_post(self):
-        if 'name' in dir(self) and 'value' in dir(self):
+        if 'name' in self.__dict__ and 'value' in self.__dict__:
             return True
         else:
             print('ERROR: The name and value variables are required to POST.')
@@ -82,12 +80,12 @@ class NetworkObject:
 
     @property
     def valid_for_get(self):
-        if 'id' in dir(self):
+        if 'id' in self.__dict__:
             return True
 
     @property
     def valid_for_put(self):
-        if 'id' in dir(self):
+        if 'id' in self.__dict__:
             return True
         else:
             print('ERROR: The id variable is required to PUT.')
@@ -95,7 +93,7 @@ class NetworkObject:
 
     @property
     def valid_for_delete(self):
-        if 'id' in dir(self):
+        if 'id' in self.__dict__:
             return True
         else:
             print('ERROR: The id variable is required to DELETE.')
@@ -109,15 +107,15 @@ class NetworkObject:
         # Build a valid JSON formatted data string in preparation to being sent to the FMC.
         my_dict = {}
         my_dict['type'] = self.api_type
-        if 'value' in dir(self):
+        if 'value' in self.__dict__:
             my_dict['value'] = self.value
-        if 'overridable' in dir(self):
+        if 'overridable' in self.__dict__:
             my_dict['overridable'] = self.overridable
-        if 'description' in dir(self):
+        if 'description' in self.__dict__:
             my_dict['description'] = self.description
-        if 'name' in dir(self):
+        if 'name' in self.__dict__:
             my_dict['name'] = self.name
-        if 'id' in dir(self):
+        if 'id' in self.__dict__:
             my_dict['id'] = self.id
         return my_dict
 

@@ -24,10 +24,14 @@ For now, any 'get' method will just print data to the screen.  The other methods
 users_objects = [
     NetworkObject(method='post', name='A Dax Mickelson', value='1.2.3.4/32'),
     NetworkObject(method='post', name='A**B@d^MoJo!!', value='2.3.4.0/24'),
-    NetworkObject(method='getall', name='daxmShop'),
+    NetworkObject(method='get',),
     NetworkObject(method='get', id='000C2926-64BB-0ed3-0000-012884901891'),
-    NetworkObject(method='getbyname', name='daxmShop'),
+    NetworkObject(method='get', name='daxmShop'),
 ]
+
+#users_objects = [
+#    NetworkObject(method='delete', id='000C2926-64BB-0ed3-0000-012884905900')
+#]
 
 """
 Open a connection to FMC.  Optionally choose whether to deploy to FTDs once connection is closed.
@@ -39,30 +43,29 @@ with FMC(serverIP, username, password, autodeploy = autodeploy) as fmc1:
             if obj.valid_for_post:
                 do_action = True
         elif obj.method == 'get':
-            if obj.valid_for_get:
+            if 'name' in obj.__dict__:
+                """
+                Alas, you have to "getall" and parse through looking for the specific entry to get the ID.
+                Then you have to use "get" using the ID.
+                """
+                results = fmc1.send(method='get', url=obj.api_url, json_data='')
+                for item in results['items']:
+                    if item['name'] == obj.name:
+                        obj.id = item['id']
+                if 'id' not in obj.__dict__:
+                    print("ERROR: Cannot find item with name {} in {}.".format(obj.name, obj.__class__))
+                else:
+                    do_action = True
+            else:
                 do_action = True
         elif obj.method == 'put':
             if obj.valid_for_put:
                 do_action = True
         elif obj.method == 'delete':
+            if 'name' in obj.__dict__:
+                pass
             if obj.valid_for_delete:
                 do_action = True
-        elif obj.method == 'getall':
-            if obj.valid_for_getall:
-                do_action = True
-        elif obj.method == 'getbyname':
-            """
-            Alas, you have to "getall" and parse through looking for the specific entry to get the ID.
-            Then you have to use "get" using the ID.
-            """
-            results = fmc1.send(method = 'getall', url = obj.api_url, json_data='')
-            for item in results['items']:
-                if item['name'] == obj.name:
-                    obj.id = item['id']
-                    do_action = True
-                    obj.method = 'get'
-            if do_action == False:
-                print("ERROR: Cannot find item with name {} in {}.".format(obj.name, obj.__class__))
         if do_action:
             results = fmc1.send(method = obj.method, url=obj.api_url, json_data=obj.create_json())
             print("Method:{}, Results:{}\n".format(obj.method,results))

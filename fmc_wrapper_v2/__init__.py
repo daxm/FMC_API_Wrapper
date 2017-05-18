@@ -140,14 +140,14 @@ class FMC(object):
             if kwargs['method'] == 'post':
                 response = requests.post(url, json=kwargs['json_data'], headers=headers, verify=self.VERIFY_CERT)
             elif kwargs['method'] == 'get':
-                url = url + "/" + kwargs['json_data']['id']
+                url = url
+                if 'id' in kwargs['json_data']:
+                    url = url + "/" + kwargs['json_data']['id']
                 response = requests.get(url, headers=headers, verify=self.VERIFY_CERT)
             elif kwargs['method'] == 'put':
                 pass
             elif kwargs['method'] == 'delete':
                 pass
-            elif kwargs['method'] == 'getall':
-                response = requests.get(url, headers=headers, verify=self.VERIFY_CERT)
 
             status_code = response.status_code
             json_response = json.loads(response.text)

@@ -21,6 +21,23 @@ def logger(orig_function):
     return wrapper
 
 
+def syntax_correcter(value, permitted_syntax="[.\w\d_\-]", replacer='_'):
+    """
+    Check 'value' for invalid characters (identified by 'permitted_syntax') and replace them with 'replacer'.
+    :param value:  String to be checked.
+    :param permitted_syntax: (optional) regex of allowed characters.
+    :param replacer: (optional) character used to replace invalid characters.
+    :return: Modified string with "updated" characters.
+    """
+    new_value = ''
+    for char in range(0, len(value)):
+        if not re.match(permitted_syntax, value[char]):
+            new_value += replacer
+        else:
+            new_value += value[char]
+    return new_value
+
+# OLD SHIT #
 def timer(orig_function):
     """
     Calculate the time the orig_function took to run.
@@ -69,19 +86,3 @@ def syntax_checker(value, permitted_syntax="^[\w\d][.\w\d_\-]*$"):
     else:
         return True
 
-
-def syntax_correcter(value, permitted_syntax="[.\w\d_\-]", replacer='_'):
-    """
-    Check 'value' for invalid characters (identified by 'permitted_syntax') and replace them with 'replacer'.
-    :param value:  String to be checked.
-    :param permitted_syntax: (optional) regex of allowed characters.
-    :param replacer: (optional) character used to replace invalid characters.
-    :return: Modified string with "updated" characters.
-    """
-    new_value = ''
-    for char in range(0, len(value)):
-        if not re.match(permitted_syntax, value[char]):
-            new_value += replacer
-        else:
-            new_value += value[char]
-    return new_value
