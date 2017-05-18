@@ -139,7 +139,7 @@ class FMC(object):
                 if 'id' in kwargs['json_data']:
                     url = url + "/" + kwargs['json_data']['id']
                 else:
-                    url = url + "?expanded=true"
+                    url = url + "?expanded=true&limit=1000"
             status_code = 429
             while status_code == 429:
                 if kwargs['method'] == 'post':
@@ -165,38 +165,51 @@ class FMC(object):
             response.close()
         return json_response
 
-    def configure(self, users_objects):
-        for obj in users_objects:
-            do_action = False
-            if obj.method == 'post':
-                if obj.valid_for_post:
-                    do_action = True
-            elif obj.method == 'get':
-                if 'name' in obj.__dict__:
-                    """
-                    Alas, you have to "getall" and parse through looking for the specific entry to get the ID.
-                    Then you have to use "get" using the ID.
-                    """
-                    results = self.send_to_api(method='get', url=obj.api_url, json_data='')
-                    for item in results['items']:
-                        if item['name'] == obj.name:
-                            obj.id = item['id']
-                    if 'id' not in obj.__dict__:
-                        print("ERROR: Cannot find item with name {} in {}.".format(obj.name, obj.__class__))
-                    else:
-                        do_action = True
+    def search_api_paths(self):
+        for path in self.obj.search_api_paths:
+            results = self.send_to_api(method='get', url=path, json_data='')
+            if 'id' in self.obj.__dict__ or 'name' in self.obj.__dict__:
+                for item in results['items']:
+                    self.obj.api_url = path
+                    if 'id' in self.obj.__dict__:
+                        if item['id'] == self.obj.id:
+                            break
+                    if 'name' in self.obj.__dict__:
+                        if item['name'] == self.obj.name:
+                            self.obj.id = item['id']
+                            break
                 else:
-                    do_action = True
-            elif obj.method == 'put':
-                if obj.valid_for_put:
-                    do_action = True
-            elif obj.method == 'delete':
-                if 'name' in obj.__dict__:
-                    pass
-                if obj.valid_for_delete:
-                    do_action = True
-            if do_action:
-                results = self.send_to_api(method=obj.method, url=obj.api_url, json_data=obj.build_dict())
-                print("Method:{}, Results:{}\n".format(obj.method, results))
+                    break
             else:
-                print('ERROR: Method: "{}" failed to run for {}\n'.format(obj.method, obj.__class__))
+                # Enter here is "getall" is requested.  (Which is essentially if 'id' nor 'name' are present.)
+                found_resource = True
+                do_action = True
+        if not found_resource:
+            if 'name' in self.obj.__dict__:
+                print("ERROR: Cannot find item with name {} in {}.".format(self.obj.name, self.obj.__class__))
+            if 'id' in self.obj.__dict__:
+                print("ERROR: Cannot find item with name {} in {}.".format(self.obj.id, self.obj.__class__))
+
+    @property
+    def validate_data(self):
+        if self.obj.method == 'post':
+            return self.obj.valid_for_post
+        if self.obj.method == 'put':
+            return self.obj.valid_for_put
+        if self.obj.method == 'delete':
+            return self.obj.valid_for_delete
+        if self.obj.method == 'get':
+            return self.obj.valid_for_get
+
+    def configure(self, users_objects):
+        for self.obj in users_objects:
+            if self.validate_data:
+                # take action (i.e. interact with FMC)
+                if self.obj.method == 'get':
+                    pass
+                else:
+                    results = self.send_to_api(method=self.obj.method, url=self.obj.api_url, json_data=self.obj.build_dict())
+                    print("Method:{}, Results:{}\n".format(self.obj.method, results))
+            else:
+                # Whine and cry.
+                print('ERROR: Method: "{}" failed to run for {}\n'.format(self.obj.method, self.obj.__class__))

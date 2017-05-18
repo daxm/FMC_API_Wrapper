@@ -12,7 +12,8 @@ class Network:
 
     api_type = 'Network'
     api_url = 'object/networks'
-    # Here is the rough format of the 'exanded=true' output from the FMC NetworkObject GET request.
+    search_api_paths = [api_url, 'object/hosts', 'object/networkgroups']
+    # For reference, here is the rough format of the 'exanded=true' output from the FMC NetworkObject GET request.
     template_dict = {
         'links': {
             'self': None,
@@ -79,6 +80,10 @@ class Network:
         else:
             print('ERROR: The name and value variables are required to POST.')
             return False
+
+    @property
+    def valid_for_get(self):
+        return True
 
     @property
     def valid_for_put(self):

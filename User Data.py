@@ -26,15 +26,18 @@ For now, any 'get' method will just print data to the screen.  The other methods
 #    Network(method='post', name='A Dax Mickelson', value='1.2.3.4/32'),
 #    Network(method='post', name='A Nother Host', value='1.2.3.3'),
 #    Network(method='post', name='A W!@#$T!!@#%#$F', value='3.2.1.0/24'),
-#    Network(method='get',),
-#    Network(method='get', id='000C2926-64BB-0ed3-0000-012884901891'),
-#    Network(method='get', name='daxmShop'),
-#    Network(),
 #]
 
-users_objects = [
-    Network(method='get', name='A Dax Mickelson')
-]
+# Try every combination of 'get' for Network Class.
+#users_objects = [
+#    Network(method='get', id='000C2926-64BB-0ed3-0000-012884907300'),
+#    Network(method='get', name='A Dax Mickelson'),
+#    Network(method='get', id='15b12b14-dace-4117-b9d9-a9a7dcfa356f'),
+#    Network(method='get', name='IPv4-Private-All-RFC1918'),
+#    Network(method='get', id='000C2926-64BB-0ed3-0000-012884907318'),
+#    Network(method='get', name='A_W____T_______F'),
+#    Network(),
+#]
 
 #users_objects = [
 #    Network(method='delete', id='000C2926-64BB-0ed3-0000-012884906404'),
