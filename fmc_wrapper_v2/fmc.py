@@ -10,11 +10,13 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import json
 from .helper_tools import *
 
+
 @logger
 class FMC(object):
     """
     This class contains the methods used when interacting with the FMC.
-    Mainly around establishing and maintaining the connection and performing any Method actions (get, put, post, delete).
+    Mainly around establishing and maintaining the connection and performing
+     any Method actions (get, put, post, delete).
     """
 
     API_PLATFORM_VERSION = '/api/fmc_platform/v1/'
@@ -58,7 +60,7 @@ class FMC(object):
                         'X-auth-refresh-token': self.refreshtoken}
         url = "https://" + self.host + self.API_PLATFORM_VERSION + "auth/refreshtoken"
         print("Refreshing token from %s.\n" % url)
-        response = requests.post(url, headers=self.headers, verify=self.VERIFY_CERT)
+        requests.post(url, headers=self.headers, verify=self.VERIFY_CERT)
         self.token_refreshes += 1
         self.reset_token_expiry()
         self.token = self.headers.get('X-auth-access-token')
@@ -116,8 +118,8 @@ class FMC(object):
             print("No devices need deployed.")
             return
         nowtime = int(1000 * datetime.datetime.now().timestamp())
-        json_data = {'type': 'DeploymentRequest', 'forceDeploy': True, 'ignoreWarning': True, 'version': nowtime,
-            'deviceList': []}
+        json_data = {'type': 'DeploymentRequest', 'forceDeploy': True, 'ignoreWarning': True,
+                     'version': nowtime, 'deviceList': []}
         for device in devices:
             print("Adding device %s to deployment queue." % device)
             json_data['deviceList'].append(device)
@@ -127,26 +129,32 @@ class FMC(object):
 
     def send_to_api(self, **kwargs):
         self.checktoken()
+        response = None
+        json_response = None
         # POST json_data with the REST CALL
         try:
             headers = {'Content-Type': 'application/json', 'X-auth-access-token': self.token}
             url = self.base_url + '/' + kwargs['url']
-
-            if kwargs['method'] == 'post':
-                response = requests.post(url, json=kwargs['json_data'], headers=headers, verify=self.VERIFY_CERT)
-            elif kwargs['method'] == 'get':
-                url = url
+            if kwargs['method'] == 'get':
                 if 'id' in kwargs['json_data']:
                     url = url + "/" + kwargs['json_data']['id']
                 else:
                     url = url + "?expanded=true"
-                response = requests.get(url, headers=headers, verify=self.VERIFY_CERT)
-            elif kwargs['method'] == 'put':
-                pass
-            elif kwargs['method'] == 'delete':
-                pass
-
-            status_code = response.status_code
+            status_code = 429
+            while status_code == 429:
+                if kwargs['method'] == 'post':
+                    response = requests.post(url, json=kwargs['json_data'], headers=headers, verify=self.VERIFY_CERT)
+                elif kwargs['method'] == 'get':
+                    response = requests.get(url, headers=headers, verify=self.VERIFY_CERT)
+                elif kwargs['method'] == 'put':
+                    response = requests.put(url, headers=headers, verify=self.VERIFY_CERT)
+                elif kwargs['method'] == 'delete':
+                    response = requests.delete(url, headers=headers, verify=self.VERIFY_CERT)
+                status_code = response.status_code
+                if status_code == 429:
+                    waittime = 60
+                    print("Sending too many requests to the FMC too fast.  Waiting {} seconds and trying again.".format(waittime))
+                    time.sleep(waittime)
             json_response = json.loads(response.text)
             if status_code > 301 or 'error' in json_response:
                 response.raise_for_status()

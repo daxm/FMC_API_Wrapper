@@ -22,11 +22,18 @@ For now, any 'get' method will just print data to the screen.  The other methods
  or a reason for failure.
 """
 
+#users_objects = [
+#    Network(method='post', name='A Dax Mickelson', value='1.2.3.4/32'),
+#    Network(method='post', name='A Nother Host', value='1.2.3.3'),
+#    Network(method='post', name='A W!@#$T!!@#%#$F', value='3.2.1.0/24'),
+#    Network(method='get',),
+#    Network(method='get', id='000C2926-64BB-0ed3-0000-012884901891'),
+#    Network(method='get', name='daxmShop'),
+#    Network(),
+#]
+
 users_objects = [
-    Network(method='get',),
-    Network(method='get', id='000C2926-64BB-0ed3-0000-012884901891'),
-    Network(method='get', name='daxmShop'),
-    Network(),
+    Network(method='get', name='A Dax Mickelson')
 ]
 
 #users_objects = [

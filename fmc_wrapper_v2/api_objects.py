@@ -4,6 +4,7 @@ All the API objects that I support will have a class in this file.
 
 from .helper_tools import *
 
+
 class Network:
     """
     Build a NetworkObject instance, sanitize its inputs (per what the FMC API will accept).
@@ -78,11 +79,6 @@ class Network:
         else:
             print('ERROR: The name and value variables are required to POST.')
             return False
-
-    @property
-    def valid_for_get(self):
-        if 'id' in self.__dict__:
-            return True
 
     @property
     def valid_for_put(self):
