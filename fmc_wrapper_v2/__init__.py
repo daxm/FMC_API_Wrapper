@@ -1,10 +1,10 @@
-
 import datetime
 import requests
 import sys
 import time
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .api_objects import *
+import json
 
 """
 Firepower Management Center API wrapper class for managing Firepower Threat Defense and legacy Firepower devicesthrough a Firepower Management Center
@@ -138,9 +138,9 @@ class FMC(object):
             url = self.base_url + '/' + kwargs['url']
 
             if kwargs['method'] == 'post':
-                response = requests.post(url, data=kwargs['json_data'], headers=headers, verify=self.VERIFY_CERT)
+                response = requests.post(url, json=kwargs['json_data'], headers=headers, verify=self.VERIFY_CERT)
             elif kwargs['method'] == 'get':
-                url = url + "/" + kwargs['id']
+                url = url + "/" + kwargs['json_data']['id']
                 response = requests.get(url, headers=headers, verify=self.VERIFY_CERT)
             elif kwargs['method'] == 'put':
                 pass

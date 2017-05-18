@@ -1,5 +1,4 @@
 from .decorate import logger, syntax_correcter
-import json
 
 """
 All the API objects that I support will have a class in this file.
@@ -120,9 +119,7 @@ class NetworkObject:
             my_dict['name'] = self.name
         if 'id' in dir(self):
             my_dict['id'] = self.id
-        return json.dumps(my_dict)
+        return my_dict
 
     def get_id(self):
-
-
-
+        pass
