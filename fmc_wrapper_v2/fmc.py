@@ -1,3 +1,7 @@
+"""
+Essentially this file is the FMC class and its methods.
+"""
+
 import datetime
 import requests
 import sys
