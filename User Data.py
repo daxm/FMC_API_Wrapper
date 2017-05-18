@@ -22,27 +22,34 @@ For now, any 'get' method will just print data to the screen.  The other methods
  or a reason for failure.
 """
 
-#users_objects = [
-#    Network(method='post', name='A Dax Mickelson', value='1.2.3.4/32'),
-#    Network(method='post', name='A Nother Host', value='1.2.3.3'),
-#    Network(method='post', name='A W!@#$T!!@#%#$F', value='3.2.1.0/24'),
-#]
+"""
+# Testing 'post' method.
+users_objects = [
+    Network(method='post', name='A Dax Mickelson', value='1.2.3.4/32'),
+    Network(method='post', name='A Nother Host', value='1.2.3.3'),
+    Network(method='post', name='A W!@#$T!!@#%#$F', value='3.2.1.0/24'),
+]
+"""
 
-# Try every combination of 'get' for Network Class.
-#users_objects = [
-#    Network(method='get', id='000C2926-64BB-0ed3-0000-012884907300'),
-#    Network(method='get', name='A Dax Mickelson'),
-#    Network(method='get', id='15b12b14-dace-4117-b9d9-a9a7dcfa356f'),
-#    Network(method='get', name='IPv4-Private-All-RFC1918'),
-#    Network(method='get', id='000C2926-64BB-0ed3-0000-012884907318'),
-#    Network(method='get', name='A_W____T_______F'),
-#    Network(),
-#]
+# Try every combination of 'get' for Network Class.  'get' for Host, Networks, and NetworkGroups.
+# 'get' by name, id, and 'getall' as default method.
+users_objects = [
+    Network(method='get', id='000C2926-64BB-0ed3-0000-012884907478'),
+    Network(method='get', name='A Dax Mickelson'),
+    Network(method='get', id='000C2926-64BB-0ed3-0000-012884907573'),
+    Network(method='get', name='daxm_range'),
+    Network(method='get', id='000C2926-64BB-0ed3-0000-012884907514'),
+    Network(method='get', name='A_W____T_______F'),
+    Network(),
+]
 
-#users_objects = [
-#    Network(method='delete', id='000C2926-64BB-0ed3-0000-012884906404'),
-#    Network(method='delete', name='A Dax Mickelson')
-#]
+"""
+# Testing 'delete' method.  (Haven't tried this yet.)
+users_objects = [
+    Network(method='delete', id='000C2926-64BB-0ed3-0000-012884906404'),
+    Network(method='delete', name='A Dax Mickelson')
+]
+"""
 
 """
 Open a connection to FMC.  Optionally choose whether to deploy to FTDs once connection is closed.

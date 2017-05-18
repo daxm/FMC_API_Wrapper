@@ -127,6 +127,17 @@ class FMC(object):
         response = self.send_to_api(url=url, json_data=json_data)
         return response['deviceList']
 
+    @property
+    def validate_data(self):
+        if self.obj.method == 'post':
+            return self.obj.valid_for_post
+        if self.obj.method == 'put':
+            return self.obj.valid_for_put
+        if self.obj.method == 'delete':
+            return self.obj.valid_for_delete
+        if self.obj.method == 'get':
+            return self.obj.valid_for_get
+
     def send_to_api(self, **kwargs):
         self.checktoken()
         response = None
@@ -165,51 +176,49 @@ class FMC(object):
             response.close()
         return json_response
 
+    def analyze_get_results(self, results):
+        for item in results['items']:
+            if 'id' in self.obj.__dict__:
+                if item['id'] == self.obj.id:
+                    self.accumulated_results = results
+                    return True
+            elif 'name' in self.obj.__dict__:
+                if item['name'] == self.obj.name:
+                    self.obj.id = item['id']
+                    self.accumulated_results = results
+                    return True
+            else:
+                return False
+
     def search_api_paths(self):
+        self.accumulated_results = []
         for path in self.obj.search_api_paths:
             results = self.send_to_api(method='get', url=path, json_data='')
             if 'id' in self.obj.__dict__ or 'name' in self.obj.__dict__:
-                for item in results['items']:
-                    self.obj.api_url = path
-                    if 'id' in self.obj.__dict__:
-                        if item['id'] == self.obj.id:
-                            break
-                    if 'name' in self.obj.__dict__:
-                        if item['name'] == self.obj.name:
-                            self.obj.id = item['id']
-                            break
-                else:
+                self.obj.api_url = path
+                if self.analyze_get_results(results):
                     break
             else:
                 # Enter here is "getall" is requested.  (Which is essentially if 'id' nor 'name' are present.)
-                found_resource = True
-                do_action = True
-        if not found_resource:
-            if 'name' in self.obj.__dict__:
-                print("ERROR: Cannot find item with name {} in {}.".format(self.obj.name, self.obj.__class__))
-            if 'id' in self.obj.__dict__:
-                print("ERROR: Cannot find item with name {} in {}.".format(self.obj.id, self.obj.__class__))
-
-    @property
-    def validate_data(self):
-        if self.obj.method == 'post':
-            return self.obj.valid_for_post
-        if self.obj.method == 'put':
-            return self.obj.valid_for_put
-        if self.obj.method == 'delete':
-            return self.obj.valid_for_delete
-        if self.obj.method == 'get':
-            return self.obj.valid_for_get
+                
+        return self.accumulated_results
 
     def configure(self, users_objects):
         for self.obj in users_objects:
             if self.validate_data:
                 # take action (i.e. interact with FMC)
                 if self.obj.method == 'get':
-                    pass
+                    """
+                    The 'get' method is a pain since it needs to possibly be run against multiple API paths.  (You
+                     can 'post' using one api_path but the data is actually moved/stored in another path (and is only
+                      accessible via that path).)
+                    'get' either "all" or find data based on 'name' or 'id'.
+                    
+                    """
+                    results = self.search_api_paths()
                 else:
                     results = self.send_to_api(method=self.obj.method, url=self.obj.api_url, json_data=self.obj.build_dict())
-                    print("Method:{}, Results:{}\n".format(self.obj.method, results))
+                print("Method:{}, Results:{}\n".format(self.obj.method, results))
             else:
                 # Whine and cry.
                 print('ERROR: Method: "{}" failed to run for {}\n'.format(self.obj.method, self.obj.__class__))

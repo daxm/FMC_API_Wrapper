@@ -12,7 +12,7 @@ class Network:
 
     api_type = 'Network'
     api_url = 'object/networks'
-    search_api_paths = [api_url, 'object/hosts', 'object/networkgroups']
+    search_api_paths = [api_url, 'object/hosts', 'object/ranges']
     # For reference, here is the rough format of the 'exanded=true' output from the FMC NetworkObject GET request.
     template_dict = {
         'links': {
