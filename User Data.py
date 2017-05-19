@@ -28,21 +28,24 @@ users_objects = [
     Network(method='post', name='A Dax Mickelson', value='1.2.3.4/32'),
     Network(method='post', name='A Nother Host', value='1.2.3.3'),
     Network(method='post', name='A W!@#$T!!@#%#$F', value='3.2.1.0/24'),
+    Network(method='post', name='A_Ranger', value='1.1.1.1-2.2.2.2'),
 ]
 """
+
 """
 # Try every combination of 'get' for Network Class.  'get' for Host, Networks, and NetworkGroups.
 # 'get' by name, id, and 'getall' as default method.
 users_objects = [
-    Network(method='get', id='000C2926-64BB-0ed3-0000-012884907478'),
+    Network(method='get', id='000C2926-64BB-0ed3-0000-012884907880'),
     Network(method='get', name='A Dax Mickelson'),
-    Network(method='get', id='000C2926-64BB-0ed3-0000-012884907573'),
-    Network(method='get', name='daxm_range'),
-    Network(method='get', id='000C2926-64BB-0ed3-0000-012884907514'),
+    Network(method='get', id='000C2926-64BB-0ed3-0000-012884907916'),
     Network(method='get', name='A_W____T_______F'),
+    Network(method='get', id='000C2926-64BB-0ed3-0000-012884908007'),
+    Network(method='get', name='A_Ranger'),
     Network(),
 ]
 """
+
 """
 # Testing 'delete' method.  (Haven't tried this yet.)
 users_objects = [
@@ -56,7 +59,7 @@ Open a connection to FMC.  Optionally choose whether to deploy to FTDs once conn
 """
 with FMC(serverIP, username, password, autodeploy = autodeploy) as fmc1:
     if 'users_objects' in locals():
-        fmc1.configure(users_objects)
+        fmc1.batch_send(users_objects)
     else:
         print("Nothing passed.  Try defining 'user_objects' list of objects you want to send to the FMC API.\n")
 

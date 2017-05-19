@@ -12,7 +12,6 @@ class Network:
 
     api_type = 'Network'
     api_url = 'object/networks'
-    search_api_paths = [api_url, 'object/hosts', 'object/ranges']
     # For reference, here is the rough format of the 'exanded=true' output from the FMC NetworkObject GET request.
     template_dict = {
         'links': {
@@ -50,6 +49,15 @@ class Network:
 
         if 'value' in kwargs:
             self.value = kwargs['value']
+            tmp =check_for_host_or_range(self.value)
+            if tmp == 'host':
+                print("Warning: value={}  Host variables are stored elsewhere."
+                      "POST will work but GET won't.".format(self.value))
+            elif tmp == 'range':
+                print("Warning: value={}  Range variables are stored elsewhere."
+                      "POST will work but GET won't.".format(self.value))
+
+
 
         if 'overridable' in kwargs:
             self.overridable = kwargs['overridable']
