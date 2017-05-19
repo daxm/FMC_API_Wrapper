@@ -48,15 +48,22 @@ class Network:
             self.links = kwargs['links']
 
         if 'value' in kwargs:
-            self.value = kwargs['value']
-            tmp =check_for_host_or_range(self.value)
-            if tmp == 'host':
+            # The FMC's 'Network' API will accept 'host' and 'range' POSTs but then you cannot
+            #  retrieve them from here.  Inform the user of such.
+            value_type = check_for_host_or_range(kwargs['value'])
+            if value_type == 'host':
                 print("Warning: value={}  Host variables are stored elsewhere."
-                      "POST will work but GET won't.".format(self.value))
-            elif tmp == 'range':
+                      "POST will work but GET won't.".format(kwargs['value']))
+            elif value_type == 'range':
                 print("Warning: value={}  Range variables are stored elsewhere."
-                      "POST will work but GET won't.".format(self.value))
+                      "POST will work but GET won't.".format(kwargs['value']))
 
+            # The 'value' value MUST be checked to ensure it matches a proper form.
+            value_formatted = validate_ip_bitmask_range(kwargs['value'], value_type = value_type)
+            if value_formatted['valid'] == True:
+                self.value = value_formatted['value']
+            else:
+                print("Attribute 'value={}' provided but isn't in a usable format.".format(kwargs['value']))
 
 
         if 'overridable' in kwargs:

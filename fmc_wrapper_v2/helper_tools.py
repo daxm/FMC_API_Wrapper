@@ -4,6 +4,7 @@ Misc methods/functions that are used by the api_objects.py and/or fmc.py logic.
 
 from functools import wraps
 import re
+import ipaddress
 
 
 def logger(orig_function):
@@ -49,8 +50,8 @@ def check_for_host_or_range(value):
     :return: 
     """
     if '/' in value:
-        value_split = value.split('/')
-        if value_split[1] == '32' or value_split[1] == '128':
+        ip, bitmask = value.split('/')
+        if ip == '32' or bitmask == '128':
             return 'host'
         else:
             return 'network'
@@ -60,3 +61,38 @@ def check_for_host_or_range(value):
         else:
             return 'host'
 
+
+def is_ip(ip):
+    try:
+        ipaddress.ip_address(ip)
+    except ValueError as err:
+        print(err)
+        return False
+    return True
+
+
+def is_ip_network(ip):
+    try:
+        ipaddress.ip_network(ip)
+    except ValueError as err:
+        print(err)
+        return False
+    return True
+
+
+def validate_ip_bitmask_range(value, value_type):
+    """
+    We need to check the provided IP address (or range of addresses) and make sure the IPs are valid.
+    :param value: IP, IP/Bitmask, or IP Range
+    :param value_type: 
+    :return: dict {value=value_fixed, valid=boolean}
+    """
+    return_dict = {'value': value, 'valid': False}
+    if value_type == 'range':
+        for ip in value.split('-'):
+            if is_ip(ip):
+                return_dict['valid'] = True
+    elif value_type == 'host' or value_type == 'network':
+        if is_ip_network(value):
+            return_dict['valid'] = True
+    return return_dict

@@ -44,23 +44,19 @@ users_objects = [
     Network(method='get', name='A_Ranger'),
     Network(),
 ]
+    Network(method='delete', name='A Dax Mickelson'),
 """
 
-"""
+
 # Testing 'delete' method.  (Haven't tried this yet.)
 users_objects = [
-    Network(method='delete', id='000C2926-64BB-0ed3-0000-012884906404'),
-    Network(method='delete', name='A Dax Mickelson')
+    Network(method='post', name='AAABBBCCC', value='5.5.5.0/24'),
 ]
-"""
 
 """
 Open a connection to FMC.  Optionally choose whether to deploy to FTDs once connection is closed.
 """
 with FMC(serverIP, username, password, autodeploy = autodeploy) as fmc1:
-    if 'users_objects' in locals():
-        fmc1.batch_send(users_objects)
-    else:
-        print("Nothing passed.  Try defining 'user_objects' list of objects you want to send to the FMC API.\n")
+    fmc1.batch_send(users_objects)
 
 print('Connection to FMC is now exited.  Thank you for playing.')
