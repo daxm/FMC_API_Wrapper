@@ -5,7 +5,7 @@ Misc methods/functions that are used by the api_objects.py and/or fmc.py logic.
 from functools import wraps
 import re
 import ipaddress
-
+import json
 
 def logger(orig_function):
     """
@@ -96,3 +96,13 @@ def validate_ip_bitmask_range(value, value_type):
         if is_ip_network(value):
             return_dict['valid'] = True
     return return_dict
+
+def mocked_requests_get(**kwargs):
+    class MockResponse:
+        def __init__(self, **kwargs):
+            self.text = json.dumps(kwargs['text'])
+            self.status_code = kwargs['status_code']
+
+        def close(self):
+            return True
+    return MockResponse(**kwargs)

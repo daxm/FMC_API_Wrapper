@@ -74,7 +74,6 @@ class FMC(object):
         response = requests.post(url, headers=self.headers,
                                  auth=requests.auth.HTTPBasicAuth(self.username, self.password),
                                  verify=self.VERIFY_CERT)
-
         self.token = response.headers.get('X-auth-access-token')
         self.refreshtoken = response.headers.get('X-auth-refresh-token')
         self.uuid = response.headers.get('DOMAIN_UUID')
@@ -98,7 +97,7 @@ class FMC(object):
         time.sleep(waittime)
         print("Getting a list of deployable devices.")
         url = "/deployment/deployabledevices?expanded=true"
-        response = self.send_to_api(method='get', url=url, json_data='') # BROKEN.  Needs to be an obj.
+        response = self.send_to_api(method='get', url=url, json_data='')  # BROKEN.  Needs to be an obj.
         # Now to parse the response list to get the UUIDs of each device.
         if 'items' not in response:
             return
@@ -123,7 +122,7 @@ class FMC(object):
             print("Adding device %s to deployment queue." % device)
             json_data['deviceList'].append(device)
         print("Deploying changes to devices.")
-        response = self.send_to_api(method='get', url=url, json_data=json_data) # BROKEN.  Needs to be an obj.
+        response = self.send_to_api(method='get', url=url, json_data=json_data)  # BROKEN.  Needs to be an obj.
         return response['deviceList']
 
     @property
@@ -137,8 +136,26 @@ class FMC(object):
         if self.obj.method == 'get':
             return self.obj.valid_for_get
 
+    @property
+    def api_resource_exists(self):
+        if 'id' in self.obj.__dict__:
+            tmp_method = self.obj.method
+            self.obj.method = 'get'
+            results = send_to_api()
+            self.obj.method = tmp_method
+            if 'items' in results:
+                if 'id' in results['items']:
+                    return True
+        elif 'name' in self.obj.__dict__ and self.get_id_via_name:
+            return True
+        return False
+
+    @property
     def get_id_via_name(self):
+        tmp_method = self.obj.method
+        self.obj.method = 'get'
         results = self.send_to_api()
+        self.obj.method = tmp_method
         for item in results['items']:
             if item['name'] == self.obj.name:
                 self.obj.id = item['id']
@@ -161,13 +178,21 @@ class FMC(object):
             status_code = 429
             while status_code == 429:
                 if self.obj.method == 'post':
-                    response = requests.post(url, json=self.obj.build_dict(), headers=headers, verify=self.VERIFY_CERT)
+                    # Check to see whether this resource already exists.
+                    if not self.api_resource_exists:
+                        response = requests.post(url, json=self.obj.build_dict(),
+                                                 headers=headers, verify=self.VERIFY_CERT)
+                    else:
+                        text = "Send to API aborted.  This {} with a name of {} already " \
+                               "exists.".format(self.obj.api_type, self.obj.name)
+                        response = mocked_requests_get(status_code = 0, text = text)
                 elif self.obj.method == 'get':
                     response = requests.get(url, headers=headers, verify=self.VERIFY_CERT)
                 elif self.obj.method == 'put':
                     response = requests.put(url, json=self.obj.build_dict(), headers=headers, verify=self.VERIFY_CERT)
                 elif self.obj.method == 'delete':
-                    response = requests.delete(url, json=self.obj.build_dict(), headers=headers, verify=self.VERIFY_CERT)
+                    response = requests.delete(url, json=self.obj.build_dict(),
+                                               headers=headers, verify=self.VERIFY_CERT)
                 status_code = response.status_code
                 if status_code == 429:
                     waittime = 60
@@ -189,11 +214,12 @@ class FMC(object):
             if self.validate_data:
                 # take action (i.e. interact with FMC)
                 if self.obj.method == 'get' and 'name' in self.obj.__dict__ and 'id' not in self.obj.__dict__:
-                    if self.get_id_via_name():
+                    if self.get_id_via_name:
                         results = self.send_to_api()
                         print("Method:{}, Results:{}".format(self.obj.method, results))
                     else:
-                        print("ERROR: Failed to find an 'id' for 'name':{} in object:{}\n".format(self.obj.name, self.obj.__class__))
+                        print("ERROR: Failed to find an 'id' for 'name':{} in "
+                              "object:{}\n".format(self.obj.name, self.obj.__class__))
                 else:
                     results = self.send_to_api()
                     print("Method:{}, Results:{}\n".format(self.obj.method, results))
