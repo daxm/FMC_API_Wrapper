@@ -7,6 +7,7 @@ import re
 import ipaddress
 import json
 
+
 def logger(orig_function):
     """
     Create/Modify a log file with the name of the orig_function.
@@ -96,6 +97,7 @@ def validate_ip_bitmask_range(value, value_type):
         if is_ip_network(value):
             return_dict['valid'] = True
     return return_dict
+
 
 def mocked_requests_get(**kwargs):
     class MockResponse:

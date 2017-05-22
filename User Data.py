@@ -1,5 +1,4 @@
-from fmc_wrapper_v2.api_objects import *
-from fmc_wrapper_v2.fmc import FMC
+from fmc_wrapper_v2 import *
 import sys
 
 """
@@ -22,6 +21,7 @@ For now, any 'get' method will just print data to the screen.  The other methods
  or a reason for failure.
 """
 
+"""
 # Testing 'post' method.
 users_objects = [
     Network(method='post', name='A Dax Mickelson', value='1.2.3.4/32'),
@@ -29,8 +29,9 @@ users_objects = [
     Network(method='post', name='A W!@#$T!!@#%#$F', value='3.2.1.0/24'),
     Network(method='post', name='A_Ranger', value='1.1.1.1-2.2.2.2'),
     Network(method='post', name='AB_Ranger', value='1.1.1.1-2.2.2.2'),
-    Network(method='post', name='A W!@#$T!!@#%#$F', value='3.2.1.0/24'),
 ]
+"""
+
 """
 # Try every combination of 'get' for Network Class.  'get' for Host, Networks, and NetworkGroups.
 # 'get' by name, id, and 'getall' as default method.
@@ -43,15 +44,16 @@ users_objects = [
     Network(method='get', name='A_Ranger'),
     Network(),
 ]
-    Network(method='delete', name='A Dax Mickelson'),
 """
-
 """
 # Testing 'delete' method.  (Haven't tried this yet.)
 users_objects = [
     Network(method='post', name='AAABBBCCC', value='5.5.5.0/24'),
 ]
 """
+
+users_objects = [Network(method='get', name='A Dax Mickelson'),]
+
 
 """
 Open a connection to FMC.  Optionally choose whether to deploy to FTDs once connection is closed.

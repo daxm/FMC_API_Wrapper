@@ -7,4 +7,6 @@ http://www.cisco.com/c/en/us/td/docs/security/firepower/610/api/REST/
  
 """
 
-from . import *
+from .fmc import *
+from .api_objects import *
+__all__ = (fmc.__all__ + api_objects.__all__)
