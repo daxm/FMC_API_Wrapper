@@ -3,11 +3,9 @@ All the API objects that I support will have a class in this file.
 """
 
 from .helper_tools import *
+from . import export
 
-# List the symbols that are exposed to the user.
-__all__ = ['Network']
-
-
+@export
 class Network:
     """
     Build a NetworkObject instance, sanitize its inputs (per what the FMC API will accept).
@@ -113,7 +111,7 @@ class Network:
 
     @property
     def valid_for_delete(self):
-        if 'id' in self.__dict__:
+        if 'id' in self.__dict__ or 'name' in self.__dict__:
             return True
         else:
             print('ERROR: The id variable is required to DELETE.')

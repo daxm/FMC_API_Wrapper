@@ -9,10 +9,10 @@ import time
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import json
 from .helper_tools import *
+from . import export
 
-# List the symbols that are exposed to the user.
-__all__ = ['FMC']
 
+@export
 class FMC(object):
     """
     This class contains the methods used when interacting with the FMC.
@@ -187,11 +187,20 @@ class FMC(object):
                             response = requests.post(url, json=self.obj.build_dict(),
                                                  headers=headers, verify=self.VERIFY_CERT)
                         elif self.obj.method == 'delete':
-                            response = requests.delete(url, json=self.obj.build_dict(),
-                                                 headers=headers, verify=self.VERIFY_CERT)
+                            if 'name' in self.obj.__dict__ and 'id' not in self.obj.__dict__:
+                                if self.get_id_via_name:
+                                    response = requests.delete(url, json=self.obj.build_dict(),
+                                                               headers=headers, verify=self.VERIFY_CERT)
+                                else:
+                                    text = ("'id' required to delete but none provided.")
+                                    response = mocked_requests_get(status_code=204, text=text)
+                            else:
+                                url = url + "/" + self.obj.id
+                                response = requests.delete(url, json=self.obj.build_dict(), headers=headers,
+                                                           verify=self.VERIFY_CERT)
                     elif self.obj.method == 'post' and not existence_check:
                         response = requests.post(url, json=self.obj.build_dict(), headers=headers,
-                                                verify=self.VERIFY_CERT)
+                                                 verify=self.VERIFY_CERT)
                     else:
                         text = "Send to API aborted.  This {} with a name of {} already " \
                                "exists.".format(self.obj.api_type, self.obj.name)

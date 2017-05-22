@@ -31,7 +31,6 @@ users_objects = [
     Network(method='post', name='AB_Ranger', value='1.1.1.1-2.2.2.2'),
 ]
 """
-
 """
 # Try every combination of 'get' for Network Class.  'get' for Host, Networks, and NetworkGroups.
 # 'get' by name, id, and 'getall' as default method.
@@ -48,17 +47,16 @@ users_objects = [
 """
 # Testing 'delete' method.  (Haven't tried this yet.)
 users_objects = [
-    Network(method='post', name='AAABBBCCC', value='5.5.5.0/24'),
+    Network(method='post', name='AAABBBCCC', value='9.9.9.0/24'),
+    Network(method='delete', name='AAABBBCCC'),
 ]
 """
-
-users_objects = [Network(method='get', name='A Dax Mickelson'),]
-
 
 """
 Open a connection to FMC.  Optionally choose whether to deploy to FTDs once connection is closed.
 """
 with FMC(serverIP, username, password, autodeploy = autodeploy) as fmc1:
-    fmc1.batch_send(users_objects)
+    if 'users_objects' in locals():
+        fmc1.batch_send(users_objects)
 
 print('Connection to FMC is now exited.  Thank you for playing.')
