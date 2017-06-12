@@ -1,3 +1,5 @@
+#  Defunct project.  Visit https://github.com/daxm/fmcapi for currently developed project.
+
 # FMC_API_Wrapper
 # DO NOT download these scripts thinking that they will work in their current state.
 
